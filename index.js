@@ -1,6 +1,6 @@
 import { extractStructureFilesFromMcworld } from "mcbe-leveldb-reader";
 import { selectEl, downloadBlob, sleep, selectEls, loadTranslationLanguage, translate, getStackTrace, random, UserError, joinOr, conditionallyGroup, groupByFileExtension, addFilesToFileInput, setFileInputFiles, dispatchInputEvents } from "./essential.js";
-import * as HoloPrint from "./HoloPrint.js";
+import * as HoloPrint from "./HoloPrint.js"; // Certifique-se que este HoloPrint.js está atualizado com a marca "HoloLab" e o tratamento de placeholders.
 import SupabaseLogger from "./SupabaseLogger.js";
 
 import ResourcePackStack from "./ResourcePackStack.js";
@@ -16,7 +16,7 @@ const ACTUAL_CONSOLE_LOG = false;
 const supabaseProjectUrl = "https://gnzyfffwvulwxbczqpgl.supabase.co";
 const supabaseApiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduenlmZmZ3dnVsd3hiY3pxcGdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMwMjE3NzgsImV4cCI6MjAzODU5Nzc3OH0.AWMhFcP3PiMD3dMC_SeIVuPx128KVpgfkZ5qBStDuVw";
 
-window.OffscreenCanvas ?? class OffscreenCanvas {
+window.OffscreenCanvas ??= class OffscreenCanvas {
 	constructor(w, h) {
 		console.debug("Using OffscreenCanvas polyfill");
 		this.canvas = document.createElement("canvas");
@@ -28,7 +28,7 @@ window.OffscreenCanvas ?? class OffscreenCanvas {
 					if(blob) {
 						res(blob);
 					} else {
-						rej();
+						rej(new Error("Canvas to Blob conversion failed"));
 					}
 				});
 			});
@@ -38,336 +38,569 @@ window.OffscreenCanvas ?? class OffscreenCanvas {
 };
 
 let dropFileNotice;
-
-/** @type {HTMLFormElement} */
 let generatePackForm;
 let generatePackFormSubmitButton;
-/** @type {HTMLInputElement} */
 let structureFilesInput;
-/** @type {HTMLInputElement} */
 let worldFileInput;
-/** @type {HTMLInputElement} */
 let oldPackInput;
-/** @type {HTMLInputElement} */
 let structureFilesList;
 let packNameInput;
 let completedPacksCont;
 let logger;
 let languageSelector;
 let defaultResourcePackStackPromise;
-
 let supabaseLogger;
-
 let texturePreviewImageCont;
 let texturePreviewImage;
+let themeToggleButton;
+let primaryColorPicker;
+let secondaryColorPicker;
+let buttonHoverColorPicker;
+let clearResourcePackCacheButton; 
 
-document.onEvent("DOMContentLoaded", () => {
-	document.body.appendChild = selectEl("main").appendChild.bind(selectEl("main"));
-	
-	selectEls(`input[type="file"][accept]:not([multiple])`).forEach(input => {
-		input.onEventAndNow("input", e => {
-			if(!validateFileInputFileTypes(input)) {
-				e?.stopImmediatePropagation();
-			}
-		});
-	});
-	
-	generatePackForm = selectEl("#generatePackForm");
-	dropFileNotice = selectEl("#dropFileNotice");
-	structureFilesInput = selectEl("#structureFilesInput");
-	let notStructureFileError = selectEl("#notStructureFileError");
-	worldFileInput = selectEl("#worldFileInput");
-	let worldExtractionMessage = selectEl("#worldExtractionMessage");
-	let worldExtractionSuccess = selectEl("#worldExtractionSuccess");
-	let worldExtractionError = selectEl("#worldExtractionError");
-	let worldExtractionWorldError = selectEl("#worldExtractionWorldError");
-	oldPackInput = selectEl("#oldPackInput");
-	let oldPackExtractionMessage = selectEl("#oldPackExtractionMessage");
-	let oldPackExtractionSuccess = selectEl("#oldPackExtractionSuccess");
-	let oldPackExtractionError = selectEl("#oldPackExtractionError");
-	structureFilesList = selectEl("#structureFilesList");
-	packNameInput = generatePackForm.elements.namedItem("packName");
-	packNameInput.onEvent("invalid", () => {
-		packNameInput.setCustomValidity(translateCurrentLanguage("metadata.pack_name.error"));
-	});
-	packNameInput.onEvent("input", () => {
-		packNameInput.setCustomValidity("");
-	});
-	structureFilesInput.onEvent("input", () => {
-		if(!structureFilesInput.files.length) {
-			return;
-		}
-		let files = Array.from(structureFilesInput.files);
-		let filesToAdd = files.filter(file => file.name.endsWith(".mcstructure"));
-		if(files.length == filesToAdd.length) {
-			notStructureFileError.classList.add("hidden");
-			structureFilesInput.setCustomValidity("");
-		} else {
-			notStructureFileError.classList.remove("hidden");
-			structureFilesInput.setCustomValidity(notStructureFileError.textContent);
-		}
-		addFilesToFileInput(structureFilesList, filesToAdd);
-	});
-	worldFileInput.onEvent("input", async () => {
-		worldExtractionMessage.classList.add("hidden");
-		worldExtractionSuccess.classList.add("hidden");
-		worldExtractionError.classList.add("hidden");
-		worldExtractionWorldError.classList.add("hidden");
-		oldPackInput.setCustomValidity("");
-		let worldFile = worldFileInput.files[0];
-		if(!worldFile) {
-			return;
-		}
-		selectEl("#extractFromWorldTab").checked = true;
-		worldExtractionMessage.classList.remove("hidden");
-		worldExtractionMessage.scrollIntoView({
-			block: "center"
-		});
-		let structureFiles;
-		try {
-			structureFiles = await extractStructureFilesFromMcworld(worldFile);
-		} catch(e) {
-			worldExtractionMessage.classList.add("hidden");
-			worldExtractionWorldError.dataset.translationSubError = e;
-			worldExtractionWorldError.classList.remove("hidden");
-			worldFileInput.setCustomValidity(worldExtractionWorldError.textContent);
-			return;
-		}
-		worldExtractionMessage.classList.add("hidden");
-		if(structureFiles.size) {
-			addFilesToFileInput(structureFilesList, Array.from(structureFiles.values()));
-			worldExtractionSuccess.dataset.translationSubCount = structureFiles.size;
-			worldExtractionSuccess.classList.remove("hidden");
-		} else {
-			worldExtractionError.classList.remove("hidden");
-			worldFileInput.setCustomValidity(worldExtractionError.textContent);
-		}
-	});
-	oldPackInput.onEvent("input", async () => {
-		oldPackExtractionMessage.classList.add("hidden");
-		oldPackExtractionSuccess.classList.add("hidden");
-		oldPackExtractionError.classList.add("hidden");
-		oldPackInput.setCustomValidity("");
-		let oldPack = oldPackInput.files[0];
-		if(!oldPack) {
-			return;
-		}
-		selectEl("#updatePackTab").checked = true;
-		oldPackExtractionMessage.classList.remove("hidden");
-		oldPackExtractionMessage.scrollIntoView({
-			block: "center"
-		});
-		let extractedStructureFiles = await HoloPrint.extractStructureFilesFromPack(oldPack);
-		oldPackExtractionMessage.classList.add("hidden");
-		if(extractedStructureFiles.length) {
-			addFilesToFileInput(structureFilesList, extractedStructureFiles);
-			oldPackExtractionSuccess.classList.remove("hidden");
-		} else {
-			oldPackExtractionError.classList.remove("hidden");
-			oldPackInput.setCustomValidity(oldPackExtractionError.textContent);
-		}
-	});
-	structureFilesList.onEventAndNow("input", updatePackNameInputPlaceholder);
-	completedPacksCont = selectEl("#completedPacksCont");
-	texturePreviewImageCont = selectEl("#texturePreviewImageCont");
-	defaultResourcePackStackPromise = new ResourcePackStack();
-	
-	if(location.search == "?loadFile") {
-		window.launchQueue?.setConsumer(async launchParams => {
-			let launchFiles = await Promise.all(launchParams.files.map(fileHandle => fileHandle.getFile()));
-			handleInputFiles(launchFiles);
-		});
-	}
-	
-	let dragCounter = 0;
-	document.documentElement.onEvent("dragenter", () => {
-		dragCounter++;
-	});
-	document.documentElement.onEvent("dragover", e => {
-		if(e.dataTransfer?.types?.includes("Files")) { // https://html.spec.whatwg.org/multipage/dnd.html#dom-datatransfer-types-dev
-			e.preventDefault();
-			dropFileNotice.classList.remove("hidden");
-		}
-	});
-	document.documentElement.onEvent("dragleave", () => {
-		dragCounter--;
-		if(dragCounter == 0) {
-			dropFileNotice.classList.add("hidden");
-		}
-	});
-	document.documentElement.onEvent("drop", async e => {
-		e.preventDefault();
-		dragCounter = 0;
-		dropFileNotice.classList.add("hidden");
-		let files = [...e.dataTransfer.files]; // apparently this is a "historical accident": https://stackoverflow.com/a/74641156
-		handleInputFiles(files);
-	});
-	
-	customElements.define("item-criteria-input", class extends ItemCriteriaInput {
-		constructor() {
-			super(translateCurrentLanguage);
-		}
-	});
-	customElements.define("file-input-table", FileInputTable);
-	customElements.define("simple-logger", SimpleLogger);
-	if(!ACTUAL_CONSOLE_LOG) {
-		logger = selectEl("#log");
-		logger.patchConsoleMethods();
-	}
-	
-	generatePackForm.onEvent("submit", async e => {
-		e.preventDefault();
-		
-		let formData = new FormData(generatePackForm);
-		let resourcePacks = [];
-		let localResourcePackFiles = generatePackForm.elements.namedItem("localResourcePack").files;
-		if(localResourcePackFiles.length) {
+let initialTranslationsApplied = false;
+let languageIsLoading = false;
+
+async function initializePage() {
+    document.body.appendChild = selectEl("main").appendChild.bind(selectEl("main"));
+
+    selectEls(`input[type="file"][accept]:not([multiple])`).forEach(input => {
+        input.addEventListener("input", e => {
+            if (!validateFileInputFileTypes(input)) {
+                e?.stopImmediatePropagation();
+            }
+        });
+        if (input.files && input.files.length > 0) {
+            validateFileInputFileTypes(input);
+        }
+    });
+
+    generatePackForm = selectEl("#generatePackForm");
+    dropFileNotice = selectEl("#dropFileNotice");
+    structureFilesInput = selectEl("#structureFilesInput");
+    let notStructureFileError = selectEl("#notStructureFileError");
+    worldFileInput = selectEl("#worldFileInput");
+    let worldExtractionMessage = selectEl("#worldExtractionMessage");
+    let worldExtractionSuccess = selectEl("#worldExtractionSuccess");
+    let worldExtractionError = selectEl("#worldExtractionError");
+    let worldExtractionWorldError = selectEl("#worldExtractionWorldError");
+    oldPackInput = selectEl("#oldPackInput");
+    let oldPackExtractionMessage = selectEl("#oldPackExtractionMessage");
+    let oldPackExtractionSuccess = selectEl("#oldPackExtractionSuccess");
+    let oldPackExtractionError = selectEl("#oldPackExtractionError");
+    structureFilesList = selectEl("#structureFilesList");
+
+    packNameInput = generatePackForm.elements.namedItem("packName");
+    if (packNameInput) {
+        packNameInput.addEventListener("invalid", () => {
+            packNameInput.setCustomValidity(translateCurrentLanguage("metadata.pack_name.error"));
+        });
+        packNameInput.addEventListener("input", () => {
+            packNameInput.setCustomValidity("");
+        });
+    }
+
+    if(structureFilesInput){
+        structureFilesInput.addEventListener("input", () => {
+            if (!structureFilesInput.files.length) return;
+            let files = Array.from(structureFilesInput.files);
+            let filesToAdd = files.filter(file => file.name.endsWith(".mcstructure"));
+            if (files.length == filesToAdd.length) {
+                notStructureFileError.classList.add("hidden");
+                structureFilesInput.setCustomValidity("");
+            } else {
+                notStructureFileError.classList.remove("hidden");
+                // O texto já deve estar traduzido pelo translatePage inicial se a chave existir
+                structureFilesInput.setCustomValidity(notStructureFileError.textContent || translateCurrentLanguage("structure_files.error"));
+            }
+            addFilesToFileInput(structureFilesList, filesToAdd);
+        });
+    }
+
+
+    if (worldFileInput) { 
+        worldFileInput.addEventListener("input", async () => {
+            worldExtractionMessage.classList.add("hidden");
+            worldExtractionSuccess.classList.add("hidden");
+            worldExtractionError.classList.add("hidden");
+            worldExtractionWorldError.classList.add("hidden");
+            if (oldPackInput) oldPackInput.setCustomValidity("");
+            let worldFile = worldFileInput.files[0];
+            if (!worldFile) return;
+            const extractTabRadio = selectEl("#extractFromWorldTab");
+            if (extractTabRadio) extractTabRadio.checked = true; // Selecionar a aba correspondente
+            worldExtractionMessage.classList.remove("hidden");
+            worldExtractionMessage.scrollIntoView({ block: "center" });
+            let structureFiles;
+            try {
+                structureFiles = await extractStructureFilesFromMcworld(worldFile);
+            } catch (e) {
+                worldExtractionMessage.classList.add("hidden");
+                worldExtractionWorldError.dataset.translationSubError = e.message;
+                worldExtractionWorldError.classList.remove("hidden");
+                worldFileInput.setCustomValidity(worldExtractionWorldError.textContent);
+                if(languageSelector?.value) await translatePage(languageSelector.value);
+                return;
+            }
+            worldExtractionMessage.classList.add("hidden");
+            if (structureFiles && structureFiles.size) {
+                addFilesToFileInput(structureFilesList, Array.from(structureFiles.values()));
+                worldExtractionSuccess.dataset.translationSubCount = structureFiles.size.toString();
+                worldExtractionSuccess.classList.remove("hidden");
+            } else {
+                worldExtractionError.classList.remove("hidden");
+                worldFileInput.setCustomValidity(worldExtractionError.textContent);
+            }
+            if(languageSelector?.value) await translatePage(languageSelector.value);
+        });
+    }
+
+    if (oldPackInput) {
+        oldPackInput.addEventListener("input", async () => {
+            oldPackExtractionMessage.classList.add("hidden");
+            oldPackExtractionSuccess.classList.add("hidden");
+            oldPackExtractionError.classList.add("hidden");
+            oldPackInput.setCustomValidity("");
+            let oldPack = oldPackInput.files[0];
+            if (!oldPack) return;
+            const updateTabRadio = selectEl("#updatePackTab");
+            if(updateTabRadio) updateTabRadio.checked = true; // Selecionar a aba
+            oldPackExtractionMessage.classList.remove("hidden");
+            oldPackExtractionMessage.scrollIntoView({ block: "center" });
+            let extractedStructureFiles = [];
+            try {
+                extractedStructureFiles = await HoloPrint.extractStructureFilesFromPack(oldPack);
+            } catch (e) {
+                console.error("Failed to extract files from old pack:", e);
+                const errorKey = "update_pack.error";
+                let errorMessage = translateCurrentLanguage(errorKey) || "Error processing pack.";
+                 if (e.message) {
+                    errorMessage += ` (Details: ${e.message})`;
+                }
+                oldPackExtractionError.innerHTML = errorMessage; 
+            }
+            oldPackExtractionMessage.classList.add("hidden");
+            if (extractedStructureFiles.length) {
+                addFilesToFileInput(structureFilesList, extractedStructureFiles);
+                oldPackExtractionSuccess.classList.remove("hidden");
+            } else {
+                oldPackExtractionError.classList.remove("hidden");
+                oldPackInput.setCustomValidity(oldPackExtractionError.textContent);
+            }
+            if(languageSelector?.value) await translatePage(languageSelector.value);
+        });
+    }
+    
+    if (structureFilesList) {
+        structureFilesList.addEventListener("input", updatePackNameInputPlaceholder);
+        updatePackNameInputPlaceholder();
+    }
+
+    completedPacksCont = selectEl("#completedPacksCont");
+    texturePreviewImageCont = selectEl("#texturePreviewImageCont");
+    defaultResourcePackStackPromise = new ResourcePackStack();
+
+    if (location.search == "?loadFile") {
+        window.launchQueue?.setConsumer(async launchParams => {
+            if (launchParams.files && launchParams.files.length > 0) {
+                let launchFiles = await Promise.all(launchParams.files.map(fileHandle => fileHandle.getFile()));
+                handleInputFiles(launchFiles);
+            }
+        });
+    }
+
+    let dragCounter = 0;
+    document.documentElement.addEventListener("dragenter", () => dragCounter++);
+    document.documentElement.addEventListener("dragover", e => {
+        if (e.dataTransfer?.types?.includes("Files")) {
+            e.preventDefault();
+            if (dropFileNotice) dropFileNotice.classList.remove("hidden");
+        }
+    });
+    document.documentElement.addEventListener("dragleave", () => {
+        dragCounter--;
+        if (dragCounter == 0 && dropFileNotice) dropFileNotice.classList.add("hidden");
+    });
+    document.documentElement.addEventListener("drop", async e => {
+        e.preventDefault();
+        dragCounter = 0;
+        if (dropFileNotice) dropFileNotice.classList.add("hidden");
+        let files = [...e.dataTransfer.files];
+        handleInputFiles(files);
+    });
+
+    if (!customElements.get("item-criteria-input")) {
+        customElements.define("item-criteria-input", class extends ItemCriteriaInput {
+            constructor() { super(translateCurrentLanguage); }
+        });
+    }
+    if (!customElements.get("file-input-table")) {
+        customElements.define("file-input-table", FileInputTable);
+    }
+    if (!customElements.get("simple-logger")) {
+        customElements.define("simple-logger", SimpleLogger);
+    }
+    
+    if (!ACTUAL_CONSOLE_LOG) {
+        logger = selectEl("#log");
+        if (logger) logger.patchConsoleMethods();
+    }
+
+    generatePackForm.addEventListener("submit", async e => {
+        e.preventDefault();
+        let formData = new FormData(generatePackForm);
+        
+        let localResourcePackInput = generatePackForm.elements.namedItem("localResourcePack");
+        let localResourcePackFiles = localResourcePackInput?.files; // Checa se o input existe
+        let resourcePacks = [];
+		if(localResourcePackFiles && localResourcePackFiles.length) {
 			resourcePacks.push(await new LocalResourcePack(localResourcePackFiles));
 		}
-		makePack(formData.getAll("structureFiles"), resourcePacks);
-	});
-	generatePackForm.onEvent("input", e => {
-		if(e.target.closest("fieldset")?.classList?.contains("textureSettings") && e.target.hasAttribute("name")) {
-			updateTexturePreview();
-		}
-	});
-	updateTexturePreview();
-	generatePackFormSubmitButton = generatePackForm.elements.namedItem("submit");
-	
-	let opacityModeSelect = generatePackForm.elements.namedItem("opacityMode");
-	opacityModeSelect.onEventAndNow("change", () => {
-		generatePackForm.elements.namedItem("opacity").parentElement.classList.toggle("hidden", opacityModeSelect.value == "multiple");
-	});
-	
-	let descriptionTextArea = generatePackForm.elements.namedItem("description");
-	let descriptionLinksCont = selectEl("#descriptionLinksCont");
-	descriptionTextArea.onEventAndNow("input", () => {
-		let links = HoloPrint.findLinksInDescription(descriptionTextArea.value);
-		descriptionLinksCont.textContent = "";
-		links.forEach(([_, link], i) => {
-			if(i) {
-				descriptionLinksCont.appendChild(document.createElement("br"));
-			}
-			descriptionLinksCont.insertAdjacentHTML("beforeend", `<span data-translate="metadata.description.link_found">Link found:</span>`);
-			descriptionLinksCont.insertAdjacentText("beforeend", " " + link);
-		});
-	});
-	
-	let playerControlsInputCont = selectEl("#playerControlsInputCont");
-	Object.entries(HoloPrint.DEFAULT_PLAYER_CONTROLS).map(([control, itemCriteria]) => {
-		let label = document.createElement("label");
-		let playerControlTranslationKey = HoloPrint.PLAYER_CONTROL_NAMES[control];
-		label.innerHTML = `<span data-translate="${playerControlTranslationKey}">...</span>:`;
-		let input = document.createElement("item-criteria-input");
-		input.setAttribute("name", `control.${control}`);
-		if(itemCriteria["names"].length > 0) {
-			input.setAttribute("value-items", itemCriteria["names"].join(","));
-		}
-		if(itemCriteria["tags"].length > 0) {
-			input.setAttribute("value-tags", itemCriteria["tags"].join(","));
-		}
-		label.appendChild(input);
-		playerControlsInputCont.appendChild(label);
-		input.setAttribute("default", input.value); // has to be called after being added to the DOM
-	});
-	
-	let clearResourcePackCacheButton = selectEl("#clearResourcePackCacheButton");
-	clearResourcePackCacheButton.onEvent("click", async () => {
-		caches.clear();
-		temporarilyChangeText(clearResourcePackCacheButton, clearResourcePackCacheButton.dataset.resetTranslation);
-	});
-	
+
+        let packIconInputElement = generatePackForm.elements.namedItem("packIcon");
+        let packIconBlobValue = packIconInputElement?.files[0]?.size ? packIconInputElement.files[0] : undefined;
+
+        /** @type {import("./HoloPrint.js").HoloPrintConfig} */
+        let configObject = {
+            IGNORED_BLOCKS: formData.get("ignoredBlocks")?.split(/\W/).removeFalsies() ?? [],
+            SCALE: parseFloat(formData.get("scale")) / 100,
+            OPACITY: parseFloat(formData.get("opacityMode") === "single" ? formData.get("opacity") : HoloPrint.addDefaultConfig({}).OPACITY * 100) / 100,
+            MULTIPLE_OPACITIES: formData.get("opacityMode") == "multiple",
+            TINT_COLOR: formData.get("tintColor"),
+            TINT_OPACITY: parseFloat(formData.get("tintOpacity")) / 100,
+            MINI_SCALE: +formData.get("miniSize"),
+            TEXTURE_OUTLINE_WIDTH: +formData.get("textureOutlineWidth"),
+            TEXTURE_OUTLINE_COLOR: formData.get("textureOutlineColor"),
+            TEXTURE_OUTLINE_OPACITY: parseFloat(formData.get("textureOutlineOpacity")) / 100,
+            SPAWN_ANIMATION_ENABLED: !!formData.get("spawnAnimationEnabled"),
+            PLAYER_CONTROLS_ENABLED: !!formData.get("playerControlsEnabled"),
+            MATERIAL_LIST_ENABLED: !!formData.get("materialListEnabled"),
+            RETEXTURE_CONTROL_ITEMS: !!formData.get("retextureControlItems"), 
+            RENAME_CONTROL_ITEMS: !!formData.get("renameControlItems"),
+            CONTROLS: Object.fromEntries([...formData].filter(([key]) => key.startsWith("control.")).map(([key, value]) => [key.replace(/^control./, ""), JSON.parse(value)])),
+            INITIAL_OFFSET: [+formData.get("initialOffsetX"), +formData.get("initialOffsetY"), +formData.get("initialOffsetZ")],
+            BACKUP_SLOT_COUNT: +formData.get("backupSlotCount"),
+            PACK_NAME: formData.get("packName") || undefined,
+            PACK_ICON_BLOB: packIconBlobValue,
+            AUTHORS: formData.get("author")?.split(",").map(x => x.trim()).removeFalsies() ?? [],
+            DESCRIPTION: formData.get("description") || undefined,
+            COMPRESSION_LEVEL: formData.has("compressionLevel") ? +formData.get("compressionLevel") : 5,
+            PREVIEW_BLOCK_LIMIT: HoloPrint.addDefaultConfig({}).PREVIEW_BLOCK_LIMIT,
+            SHOW_PREVIEW_SKYBOX: HoloPrint.addDefaultConfig({}).SHOW_PREVIEW_SKYBOX,
+            CONTROL_ITEM_TEXTURE_SCALE: +formData.get("controlItemTextureScale") || HoloPrint.addDefaultConfig({}).CONTROL_ITEM_TEXTURE_SCALE,
+        };
+        
+        let currentResourcePackStack = await new ResourcePackStack(resourcePacks);
+        makePackAndHandleUI(formData.getAll("structureFiles"), configObject, currentResourcePackStack);
+    });
+
+    if (generatePackForm.elements.namedItem("textureOutlineWidth")) {
+        generatePackForm.addEventListener("input", e => {
+            if (e.target.closest("fieldset")?.classList?.contains("textureSettings") && e.target.hasAttribute("name")) {
+                updateTexturePreview();
+            }
+        });
+        updateTexturePreview();
+    }
+    generatePackFormSubmitButton = generatePackForm.elements.namedItem("submit");
+
+    let opacityModeSelect = generatePackForm.elements.namedItem("opacityMode");
+    if (opacityModeSelect) {
+        const opacitySettingRow = generatePackForm.elements.namedItem("opacity")?.closest("label");
+        opacityModeSelect.addEventListener("change", () => {
+            if (opacitySettingRow) {
+                opacitySettingRow.classList.toggle("hidden", opacityModeSelect.value == "multiple");
+            }
+        });
+        dispatchInputEvents(opacityModeSelect);
+    }
+
+    let descriptionTextArea = generatePackForm.elements.namedItem("description");
+    let descriptionLinksCont = selectEl("#descriptionLinksCont");
+    if (descriptionTextArea && descriptionLinksCont) {
+        descriptionTextArea.addEventListener("input", async () => { 
+            let links = HoloPrint.findLinksInDescription(descriptionTextArea.value);
+            descriptionLinksCont.textContent = "";
+            links.forEach(([_, link], i) => {
+                if (i) descriptionLinksCont.appendChild(document.createElement("br"));
+                descriptionLinksCont.insertAdjacentHTML("beforeend", `<span data-translate="metadata.description.link_found"></span>`);
+                descriptionLinksCont.insertAdjacentText("beforeend", " " + link);
+            });
+            if(languageSelector?.value) await translatePage(languageSelector.value);
+        });
+        dispatchInputEvents(descriptionTextArea);
+    }
+
+    let playerControlsInputCont = selectEl("#playerControlsInputCont");
+    if (playerControlsInputCont) {
+        Object.entries(HoloPrint.DEFAULT_PLAYER_CONTROLS).forEach(([control, itemCriteria]) => {
+            let label = document.createElement("label");
+            let playerControlTranslationKey = HoloPrint.PLAYER_CONTROL_NAMES[control];
+            label.innerHTML = `<span data-translate="${playerControlTranslationKey}"></span>:`;
+            let input = document.createElement("item-criteria-input");
+            input.setAttribute("name", `control.${control}`);
+            if (itemCriteria["names"].length > 0) input.setAttribute("value-items", itemCriteria["names"].join(","));
+            if (itemCriteria["tags"].length > 0) input.setAttribute("value-tags", itemCriteria["tags"].join(","));
+            label.appendChild(input);
+            playerControlsInputCont.appendChild(label);
+            input.setAttribute("default", input.value);
+        });
+    }
+    
+    clearResourcePackCacheButton = selectEl("#clearResourcePackCacheButton");
+    if (clearResourcePackCacheButton) { 
+        clearResourcePackCacheButton.addEventListener("click", async () => {
+            caches.clear().then(() => {
+                console.info("All caches cleared.");
+                temporarilyChangeText(clearResourcePackCacheButton, clearResourcePackCacheButton.dataset.resetTranslation || "Cache cleared!");
+            }).catch(err => {
+                console.error("Failed to clear caches:", err);
+                temporarilyChangeText(clearResourcePackCacheButton, "Error clearing cache", 3000);
+            });
+        });
+    }
+		
 	selectEls(".resetButton").forEach(el => {
-		el.onEvent("click", () => {
-			let fieldset = el.parentElement;
-			let [elementsBeingReset, elementsToSave] = conditionallyGroup(Array.from(generatePackForm.elements), el => el.localName != "fieldset" && el.localName != "button" && (!fieldset.contains(el) || !el.hasAttribute("name")));
-			let oldValues = elementsToSave.map(el => {
-				switch(el.type) {
-					case "file": {
-						let dataTransfer = new DataTransfer(); // Simply copying el.files wouldn't work since that's a FormData object, and resetting the form will reset the files in there as well. To work around this, we just copy all files to a DataTransfer, which is the only other thing that uses FormData. (Using structuredClone() is laggy on Chrome.)
-						[...el.files].forEach(file => dataTransfer.items.add(file));
-						return dataTransfer.files;
-					}
-					case "checkbox": return el.checked;
-					default: return el.value;
-				}
-			});
-			generatePackForm.reset(); // this resets the entire form, which is why the old values must be saved
-			elementsToSave.forEach((el, i) => {
-				switch(el.type) {
-					case "file": {
-						el.files = oldValues[i];
-					} break;
-					case "checkbox": {
-						el.checked = oldValues[i];
-					} break;
-					default: {
-						el.value = oldValues[i];
-					}
-				}
-			});
-			elementsBeingReset.forEach(el => {
-				dispatchInputEvents(el);
-			});
-			temporarilyChangeText(el, el.dataset.resetTranslation);
+		el.addEventListener("click", async () => { 
+            let fieldset = el.closest("fieldset"); 
+            if (!fieldset) return;
+
+            let elementsToResetInFieldset = fieldset.querySelectorAll('input:not([type="hidden"]), select, textarea, item-criteria-input');
+            
+            elementsToResetInFieldset.forEach(formEl => {
+                if (formEl.type === 'checkbox') {
+                    formEl.checked = formEl.hasAttribute('checked'); 
+                } else if (formEl.tagName === 'ITEM-CRITERIA-INPUT') {
+                    formEl.value = formEl.getAttribute('default') || '';
+                } else if (formEl.type === 'color') {
+                     formEl.value = formEl.defaultValue;
+                }
+                 else {
+                    formEl.value = formEl.defaultValue || ''; 
+                }
+                dispatchInputEvents(formEl); 
+            });
+			await temporarilyChangeText(el, el.dataset.resetTranslation);
 		});
 	});
 	
 	languageSelector = selectEl("#languageSelector");
-	fetch("translations/languages.json").then(res => res.jsonc()).then(languagesAndNames => {
-		languagesAndNames = Object.fromEntries(Object.entries(languagesAndNames).sort((a, b) => a[1] > b[1])); // sort alphabeticallly
-		let availableLanguages = Object.keys(languagesAndNames);
-		if(availableLanguages.length == 1) {
-			selectEl("#languageSelectorCont").remove();
-			return;
-		}
-		let defaultLanguage = navigator.languages.find(navigatorLanguage => {
-			let navigatorBaseLanguage = navigatorLanguage.split("-")[0];
-			return availableLanguages.find(availableLanguage => availableLanguage == navigatorLanguage) ?? availableLanguages.find(availableLanguage => availableLanguage == navigatorBaseLanguage) ?? availableLanguages.find(availableLanguage => availableLanguage.split(/-|_/)[0] == navigatorBaseLanguage);
-		}) ?? "en_US";
-		languageSelector.textContent = "";
-		for(let language in languagesAndNames) {
-			languageSelector.appendChild(new Option(languagesAndNames[language], language, false, language == defaultLanguage));
-		}
-		languageSelector.onEventAndNow("change", () => {
-			translatePage(languageSelector.value);
-		});
-		
-		let retranslating = false;
-		let bodyObserver = new MutationObserver(mutations => {
-			if(retranslating) {
-				console.log("mutations observed when retranslating:", mutations); // should never happen!
-				return;
-			}
-			let shouldRetranslate = mutations.find(mutation => mutation.type == "childList" && [...mutation.addedNodes].some(node => node instanceof Element && ([...node.attributes].some(attr => attr.name.startsWith("data-translate") || attr.name.startsWith("data-translation-sub-")) || node.getAllChildren().some(el => [...el.attributes].some(attr => attr.name.startsWith("data-translate") || attr.name.startsWith("data-translation-sub-"))))) || mutation.type == "attributes" && (mutation.attributeName.startsWith("data-translate") || mutation.attributeName.startsWith("data-translation-sub-")) && mutation.target.getAttribute(mutation.attributeName) != mutation.oldValue); // retranslate when an element with a translate dataset attribute or a child with a translate dataset attribute is added, or when a translate dataset attribute is changed
-			if(shouldRetranslate) {
-				retranslating = true;
-				translatePage(languageSelector.value);
-				retranslating = false;
-			}
-		});
-		let observerConfig = {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeOldValue: true
-		};
-		bodyObserver.observe(document.body, observerConfig);
-		document.body.getAllChildren().filter(el => el.shadowRoot).forEach(el => {
-			bodyObserver.observe(el.shadowRoot, observerConfig);
-		});
-	});
-});
-window.onEvent("load", () => { // shadow DOMs aren't populated in the DOMContentLoaded event yet
+	if (languageSelector) {
+        try {
+            const langResponse = await fetch("translations/languages.json");
+            if (!langResponse.ok) throw new Error(`Failed to fetch languages.json: ${langResponse.status}`);
+            const languagesAndNames = await langResponse.jsonc();
+            
+            const sortedLanguages = Object.fromEntries(Object.entries(languagesAndNames).sort((a, b) => a[1].localeCompare(b[1])));
+            const availableLanguages = Object.keys(sortedLanguages);
+
+            if (availableLanguages.length <= 1 && selectEl("#languageSelectorCont")) {
+                selectEl("#languageSelectorCont").remove(); // Remove o seletor se só tiver 1 idioma ou nenhum além do embutido
+                await translatePage("en_US"); // Tenta traduzir para inglês como padrão
+                initialTranslationsApplied = true;
+                applySavedThemeAndColors(); // Aplica o tema após a tradução inicial
+            } else {
+                let defaultLanguage = navigator.languages.find(navigatorLanguage => {
+                    let navigatorBaseLanguage = navigatorLanguage.split("-")[0].toLowerCase();
+                    return availableLanguages.find(availableLanguage => availableLanguage.toLowerCase() == navigatorLanguage.toLowerCase()) ?? 
+                           availableLanguages.find(availableLanguage => availableLanguage.toLowerCase() == navigatorBaseLanguage) ?? 
+                           availableLanguages.find(availableLanguage => availableLanguage.split(/-|_/)[0].toLowerCase() == navigatorBaseLanguage);
+                }) ?? "en_US";
+
+                languageSelector.innerHTML = ''; // Limpa opções antigas, caso existam
+                for (let language in sortedLanguages) {
+                    languageSelector.appendChild(new Option(sortedLanguages[language], language, false, language == defaultLanguage));
+                }
+                languageSelector.value = defaultLanguage; // Define o valor do select
+
+                languageSelector.addEventListener("change", async () => {
+                    await translatePage(languageSelector.value);
+                    // updateThemeToggleButtonText(); // Agora é chamado dentro de translatePage
+                });
+                await translatePage(defaultLanguage); // Traduz na carga inicial
+                initialTranslationsApplied = true;
+                applySavedThemeAndColors(); // Aplica o tema após a tradução inicial
+            }
+        } catch (error) {
+            console.error("Error loading or processing languages:", error);
+            // Tenta traduzir para inglês como fallback se o carregamento da lista de idiomas falhar
+            await translatePage("en_US");
+            initialTranslationsApplied = true;
+            applySavedThemeAndColors(); // Aplicar tema mesmo com erro de tradução
+            if (selectEl("#languageSelectorCont")) selectEl("#languageSelectorCont").style.display = 'none'; // Esconde o seletor
+        }
+    } else { // Caso o seletor de idioma não exista no HTML
+        await translatePage("en_US"); // Traduz para inglês por padrão
+        initialTranslationsApplied = true;
+        applySavedThemeAndColors();
+    }
+
+
+    themeToggleButton = selectEl("#themeToggleButton");
+    primaryColorPicker = selectEl("#primaryColorPicker");
+    secondaryColorPicker = selectEl("#secondaryColorPicker");
+    buttonHoverColorPicker = selectEl("#buttonHoverColorPicker");
+
+    if(themeToggleButton) {
+        themeToggleButton.addEventListener("click", () => {
+            const currentTheme = document.body.classList.contains("dark-mode") ? "dark" : "light";
+            applyTheme(currentTheme === "dark" ? "light" : "dark");
+        });
+    }
+
+    if(primaryColorPicker) primaryColorPicker.addEventListener("input", (event) => applyPrimaryColor(event.target.value));
+    if(secondaryColorPicker) secondaryColorPicker.addEventListener("input", (event) => applySecondaryColor(event.target.value));
+    if(buttonHoverColorPicker) buttonHoverColorPicker.addEventListener("input", (event) => applyButtonHoverColor(event.target.value));
+    
+    // applySavedThemeAndColors é chamado após o carregamento das traduções
+    
+    let retranslating = false;
+    const observerCallback = async (mutationsList) => {
+        if (retranslating || languageIsLoading) return;
+        let needsRetranslation = false;
+        for (const mutation of mutationsList) {
+             if (mutation.type === 'childList') {
+                for (const node of mutation.addedNodes) {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        let currentNodeToCheck = node;
+                        let checkQueue = [currentNodeToCheck];
+                        while(checkQueue.length > 0){
+                            currentNodeToCheck = checkQueue.shift();
+                            if (currentNodeToCheck.hasAttribute && (currentNodeToCheck.hasAttribute('data-translate') || Object.keys(currentNodeToCheck.dataset || {}).some(key => key.startsWith('translate')) )) {
+                                needsRetranslation = true; break;
+                            }
+                            if(currentNodeToCheck.shadowRoot){
+                                if(currentNodeToCheck.shadowRoot.querySelector('[data-translate]')){
+                                     needsRetranslation = true; break;
+                                }
+                                currentNodeToCheck.shadowRoot.querySelectorAll('*').forEach(childEl => checkQueue.push(childEl));
+                            }
+                             if(!currentNodeToCheck.shadowRoot && currentNodeToCheck.childNodes){
+                                currentNodeToCheck.childNodes.forEach(childNode => {
+                                    if(childNode.nodeType === Node.ELEMENT_NODE) checkQueue.push(childNode);
+                                });
+                            }
+                        }
+                        if (needsRetranslation) break;
+                    }
+                }
+            } else if (mutation.type === 'attributes') {
+                if (mutation.attributeName.startsWith('data-translate') && mutation.target.getAttribute(mutation.attributeName) !== mutation.oldValue) {
+                    needsRetranslation = true;
+                }
+            }
+            if (needsRetranslation) break;
+        }
+
+        if (needsRetranslation) {
+            retranslating = true;
+            if(languageSelector?.value) await translatePage(languageSelector.value);
+            requestAnimationFrame(() => { retranslating = false; });
+        }
+    };
+
+    const bodyObserver = new MutationObserver(observerCallback);
+    const observerConfig = {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeOldValue: true,
+        attributeFilter: ['data-translate', 'data-translate-title', 'data-translate-placeholder', 'data-translation-sub-count', 'data-translation-sub-error']
+    };
+    bodyObserver.observe(document.body, observerConfig);
+    document.body.querySelectorAll('*').forEach(el => {
+        if (el.shadowRoot) {
+            const shadowObserver = new MutationObserver(observerCallback);
+            shadowObserver.observe(el.shadowRoot, observerConfig);
+        }
+    });
+} // Fim de initializePage
+
+function applyTheme (theme) {
+    if (document.body.classList.contains("dark-mode") && theme === "dark") return;
+    if (!document.body.classList.contains("dark-mode") && theme === "light") return;
+
+    document.body.classList.toggle("dark-mode", theme === "dark");
+    localStorage.setItem("theme", theme);
+    updateThemeToggleButtonText(); 
+};
+
+function updateThemeToggleButtonText () {
+    if (!themeToggleButton) return;  // Só executa se o botão existir
+    const currentTheme = document.body.classList.contains("dark-mode") ? "dark" : "light";
+    const translationKey = currentTheme === "dark" ? "settings.theme.toggle_light" : "settings.theme.toggle_dark";
+    const fallbackText = currentTheme === "dark" ? "Toggle Light Mode" : "Toggle Dark Mode";
+    themeToggleButton.textContent = translateCurrentLanguage(translationKey, fallbackText);
+};
+
+function applyPrimaryColor (color) {
+    if(primaryColorPicker) primaryColorPicker.value = color;
+    document.documentElement.style.setProperty('--primary-accent-color', color);
+    localStorage.setItem("primaryColor", color);
+};
+
+function applySecondaryColor (color) {
+    if(secondaryColorPicker) secondaryColorPicker.value = color;
+    document.documentElement.style.setProperty('--secondary-accent-color', color);
+    document.documentElement.style.setProperty('--main-border-color', color); 
+    localStorage.setItem("secondaryColor", color);
+};
+
+function applyButtonHoverColor (color) {
+    if(buttonHoverColorPicker) buttonHoverColorPicker.value = color;
+    document.documentElement.style.setProperty('--button-hover-background-color', color);
+    localStorage.setItem("buttonHoverColor", color);
+};
+
+function applySavedThemeAndColors(){
+    const savedTheme = localStorage.getItem("theme");
+    const savedPrimaryColor = localStorage.getItem("primaryColor") || "#4A90E2"; 
+    const savedSecondaryColor = localStorage.getItem("secondaryColor") || "#50E3C2"; 
+    const savedButtonHoverColor = localStorage.getItem("buttonHoverColor") || "#D6EFFF"; 
+
+
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            applyTheme("dark");
+        } else {
+            applyTheme("light"); 
+        }
+    }
+    // Listener para mudança de tema do sistema, só aplica se não houver preferência do usuário salva
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+        if (!localStorage.getItem("theme")) { 
+            applyTheme(event.matches ? "dark" : "light");
+        }
+    });
+
+    // Define o valor dos pickers E aplica as cores
+    if (primaryColorPicker) { 
+        primaryColorPicker.value = savedPrimaryColor; 
+        applyPrimaryColor(savedPrimaryColor);     
+    }
+    if (secondaryColorPicker) {
+        secondaryColorPicker.value = savedSecondaryColor;
+        applySecondaryColor(savedSecondaryColor);
+    }
+    if (buttonHoverColorPicker) {
+        buttonHoverColorPicker.value = savedButtonHoverColor;
+        applyButtonHoverColor(savedButtonHoverColor);
+    }
+    // updateThemeToggleButtonText(); // Chamado dentro de applyTheme
+}
+
+
+document.addEventListener("DOMContentLoaded", initializePage);
+
+window.addEventListener("load", async () => {
 	if(location.search == "?generateEnglishTranslations") {
-		translatePage("en_US", true);
+		await translatePage("en_US", true);
 	}
+    // applySavedThemeAndColors é chamado dentro de initializePage, após o carregamento dos idiomas.
 });
 
-/**
- * Handles files that are dropped on the webpage or opened with the PWA.
- * @param {Array<File>} files
- */
 async function handleInputFiles(files) {
 	let {
 		"mcstructure": structureFiles = [],
@@ -377,15 +610,34 @@ async function handleInputFiles(files) {
 	} = groupByFileExtension(files);
 	let allWorldFiles = [...worldFiles, ...zipFiles];
 	
-	addFilesToFileInput(structureFilesList, structureFiles);
-	setFileInputFiles(worldFileInput, allWorldFiles.slice(0, 1)); // yes I could make it do all of them, but seriously, how many people are drag-and-dropping more than 1 world file onto the page?
-	setFileInputFiles(oldPackInput, resourcePackFiles.slice(0, 1));
+	if (structureFilesList && structureFiles.length > 0) addFilesToFileInput(structureFilesList, structureFiles);
+    if (worldFileInput && allWorldFiles.length > 0) setFileInputFiles(worldFileInput, allWorldFiles.slice(0, 1));
+    if (oldPackInput && resourcePackFiles.length > 0) setFileInputFiles(oldPackInput, resourcePackFiles.slice(0, 1));
 }
+
 function updatePackNameInputPlaceholder() {
-	packNameInput.setAttribute("placeholder", HoloPrint.getDefaultPackName([...structureFilesList.files]));
+    if (packNameInput && structureFilesList) {
+	    packNameInput.setAttribute("placeholder", HoloPrint.getDefaultPackName([...structureFilesList.files]));
+    }
 }
+
 async function updateTexturePreview() {
-	texturePreviewImage ??= await defaultResourcePackStackPromise.then(rps => rps.fetchResource(`textures/blocks/${random(["crafting_table_front", "diamond_ore", "blast_furnace_front_off", "brick", "cherry_planks", "chiseled_copper", "cobblestone", "wool_colored_white", "stonebrick", "stone_granite_smooth"])}.png`)).then(res => res.toImage());
+    if (!generatePackForm || 
+        !generatePackForm.elements.namedItem("textureOutlineWidth") ||
+        !generatePackForm.elements.namedItem("textureOutlineColor") ||
+        !generatePackForm.elements.namedItem("textureOutlineOpacity") ||
+        !generatePackForm.elements.namedItem("tintColor") ||
+        !generatePackForm.elements.namedItem("tintOpacity") ||
+        !texturePreviewImageCont) {
+        return;
+    }
+	texturePreviewImage ??= await defaultResourcePackStackPromise.then(rps => rps.fetchResource(`textures/blocks/${random(["crafting_table_front", "diamond_ore", "blast_furnace_front_off", "brick", "cherry_planks", "chiseled_copper", "cobblestone", "wool_colored_white", "stonebrick", "stone_granite_smooth"])}.png`)).then(res => res.toImage()).catch(err => {
+        console.error("Failed to load texture preview image:", err);
+        return null;
+    });
+	
+    if (!texturePreviewImage) return;
+
 	let can = new OffscreenCanvas(texturePreviewImage.width, texturePreviewImage.height);
 	let ctx = can.getContext("2d");
 	ctx.drawImage(texturePreviewImage, 0, 0);
@@ -397,234 +649,315 @@ async function updateTexturePreview() {
 		h: can.height
 	}], HoloPrint.addDefaultConfig({
 		TEXTURE_OUTLINE_COLOR: generatePackForm.elements.namedItem("textureOutlineColor").value,
-		TEXTURE_OUTLINE_OPACITY: generatePackForm.elements.namedItem("textureOutlineOpacity").value / 100,
+		TEXTURE_OUTLINE_OPACITY: parseFloat(generatePackForm.elements.namedItem("textureOutlineOpacity").value) / 100,
 		TEXTURE_OUTLINE_WIDTH: textureOutlineWidth
 	})) : can;
 	let tintlessImage = await outlinedCan.convertToBlob().then(blob => blob.toImage());
 	let outlinedCanCtx = outlinedCan.getContext("2d");
 	outlinedCanCtx.fillStyle = generatePackForm.elements.namedItem("tintColor").value;
-	outlinedCanCtx.globalAlpha = generatePackForm.elements.namedItem("tintOpacity").value / 100;
+	outlinedCanCtx.globalAlpha = parseFloat(generatePackForm.elements.namedItem("tintOpacity").value) / 100;
 	outlinedCanCtx.fillRect(0, 0, outlinedCan.width, outlinedCan.height);
 	let tintedImage = await outlinedCan.convertToBlob().then(blob => blob.toImage());
 	texturePreviewImageCont.textContent = "";
 	texturePreviewImageCont.appendChild(tintlessImage);
 	texturePreviewImageCont.appendChild(tintedImage);
 }
+
 async function translatePage(language, generateTranslations = false) {
-	let translatableEls = document.documentElement.getAllChildren().filter(el => [...el.attributes].some(attr => attr.name.startsWith("data-translate")));
-	await loadTranslationLanguage(language);
-	let translations = generateTranslations? await fetch(`translations/${language}.json`).then(res => res.jsonc()) : {};
-	await Promise.all(translatableEls.map(async el => {
-		if("translate" in el.dataset) {
-			let translationKey = el.dataset["translate"];
-			if(generateTranslations) {
-				translations[translationKey] = el.innerHTML.replaceAll("<code>", "`").replaceAll("</code>", "`").replaceAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g, "[$2]($1)");
+    if (languageIsLoading && !generateTranslations) {
+        return;
+    }
+    languageIsLoading = true;
+
+    let translatableEls = [];
+    try {
+        translatableEls = [...document.documentElement.querySelectorAll('[data-translate], [data-translate-title], [data-translate-placeholder]')];
+        document.querySelectorAll('*').forEach(el => {
+            if (el.shadowRoot) {
+                translatableEls.push(...el.shadowRoot.querySelectorAll('[data-translate], [data-translate-title], [data-translate-placeholder]'));
+            }
+        });
+        translatableEls = [...new Set(translatableEls)];
+    } catch (e) {
+        console.error("Error selecting translatable elements:", e);
+        languageIsLoading = false;
+        return;
+    }
+
+	try {
+        await loadTranslationLanguage(language);
+    } catch (e) {
+        console.error(`Failed to load language file for ${language}:`, e);
+        languageIsLoading = false;
+        if (language !== "en_US" && !generateTranslations) { 
+            console.warn("Attempting to load English as fallback.");
+            await translatePage("en_US", generateTranslations);
+        } else if (generateTranslations) {
+            console.error("Cannot generate translations if base language file fails to load.");
+        }
+        return;
+    }
+
+	let translations = {};
+    if (generateTranslations) {
+        try {
+            const response = await fetch(`translations/${language}.json`);
+            if(response.ok) translations = await response.jsonc();
+        } catch (e) { /* Ignora se não existir */ }
+    }
+	
+    for (const el of translatableEls) {
+		const translationDataAttributes = Object.keys(el.dataset || {}).filter(key => key.startsWith('translate'));
+
+        for (const attr of translationDataAttributes) {
+            if (!el.dataset[attr]) continue;
+            const translationKey = el.dataset[attr];
+            const targetAttribute = attr === 'translate' ? 'innerHTML' : attr.substring('translate'.length).toLowerCase();
+            
+            if(generateTranslations) {
+                let currentValue = "";
+                if (targetAttribute === 'innerhtml') {
+                    currentValue = el.innerHTML.replaceAll("<code>", "`").replaceAll("</code>", "`").replaceAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g, "[$2]($1)");
+                } else {
+                    currentValue = el.getAttribute(targetAttribute) || "";
+                }
+                if (!translations[translationKey] || translations[translationKey] !== currentValue) {
+                    translations[translationKey] = currentValue;
+                }
 			} else {
 				let translation = translate(translationKey, language);
-				if(translation != undefined) {
-					el.innerHTML = performTranslationSubstitutions(el, translation);
+				if(translation !== undefined) {
+                    const substitutedTranslation = performTranslationSubstitutions(el, translation);
+                    if (targetAttribute === 'innerhtml') {
+                        el.innerHTML = substitutedTranslation;
+                    } else {
+                        el.setAttribute(targetAttribute, substitutedTranslation);
+                    }
 				} else {
-					console.warn(`Couldn't find translation for ${translationKey} for language ${language}!`);
-					if(el.innerHTML == "") {
-						let englishTranslation = translate(translationKey, "en_US");
-						if(englishTranslation) {
-							el.innerHTML = performTranslationSubstitutions(el, englishTranslation);
-						} else {
-							el.innerHTML = translationKey;
-						}
-					}
+                    // Log foi removido daqui para reduzir ruído, já é logado na função translateCurrentLanguage
+                    let fallbackText = translationKey; 
+                    if (targetAttribute === 'innerhtml' && (el.innerHTML === "" || el.innerHTML === "..." || el.innerHTML === translationKey)) {
+                        let englishTranslation = translate(translationKey, "en_US");
+						if(englishTranslation) fallbackText = performTranslationSubstitutions(el, englishTranslation);
+                        el.innerHTML = fallbackText;
+                    } else if (targetAttribute !== 'innerhtml' && (!el.hasAttribute(targetAttribute) || el.getAttribute(targetAttribute) === "" || el.getAttribute(targetAttribute) === translationKey)) {
+                        let englishTranslation = translate(translationKey, "en_US");
+                        if(englishTranslation) fallbackText = performTranslationSubstitutions(el, englishTranslation);
+                        el.setAttribute(targetAttribute, fallbackText);
+                    }
 				}
 			}
-		}
-		[...el.attributes].filter(attr => attr.name.startsWith("data-translate-")).forEach(async attr => {
-			let targetAttrName = attr.name.replace(/^data-translate-/, "");
-			let translationKey = attr.value;
-			if(generateTranslations) {
-				translations[translationKey] = el.getAttribute(targetAttrName);
-			} else {
-				let translation = translate(translationKey, language);
-				if(translation != undefined) {
-					el.setAttribute(targetAttrName, performTranslationSubstitutions(el, translation));
-				} else {
-					console.warn(`Couldn't find translation for ${translationKey} for language ${language}!`);
-					if(!el.hasAttribute(targetAttrName)) {
-						let englishTranslation = translate(translationKey, "en_US");
-						if(englishTranslation) {
-							el.setAttribute(targetAttrName, performTranslationSubstitutions(el, englishTranslation));
-						} else {
-							el.setAttribute(targetAttrName, translationKey);
-						}
-					}
-				}
-			}
-		});
-	}));
+        }
+        if (!generateTranslations && el.innerHTML && el.innerHTML.includes('{')) { // Verifica se ainda há placeholders após a tradução inicial
+             let currentHTML = el.innerHTML;
+             let newHTML = performTranslationSubstitutions(el, currentHTML);
+             if (currentHTML !== newHTML) {
+                 el.innerHTML = newHTML;
+             }
+        }
+	}
+
 	if(generateTranslations) {
-		translations = Object.fromEntries(Object.entries(translations).sort((a, b) => a[0] > b[0]));
+		translations = Object.fromEntries(Object.entries(translations).sort((a, b) => a[0].localeCompare(b[0])));
 		downloadBlob(new File([JSON.stringify(translations, null, "\t")], `${language}.json`));
 	}
+
+    if (typeof updateThemeToggleButtonText === 'function') {
+        updateThemeToggleButtonText();
+    }
+    if (!generateTranslations) initialTranslationsApplied = true;
+    languageIsLoading = false;
 }
-/**
- * @param {Element} el
- * @param {String} translation
- * @returns {String}
- */
+
 function performTranslationSubstitutions(el, translation) {
-	const prefix = "data-translation-sub-";
-	Array.from(el.attributes).forEach(({ name, value }) => {
-		if(name.startsWith(prefix)) {
-			let subName = name.slice(prefix.length).toUpperCase().replaceAll("-", "_");
-			translation = translation.replaceAll(`{${subName}}`, value);
-			if(parseInt(value) == value) {
-				translation = value > 1? translation.replace(/\[|\]/g, "") : translation.replaceAll(/\[.+\]/g, "");
+	const prefix = "translationSub";
+	Object.keys(el.dataset).forEach(key => {
+		if(key.startsWith(prefix)) {
+			let subName = key.substring(prefix.length);
+            let snakeCasePlaceholder = subName.replace(/[A-Z]/g, (letter, index) => (index === 0 ? letter : `_${letter}`)).toUpperCase();
+            let camelCasePlaceholder = subName.charAt(0).toLowerCase() + subName.slice(1);
+
+            const value = el.dataset[key];
+			translation = translation.replaceAll(`{${snakeCasePlaceholder}}`, value);
+			translation = translation.replaceAll(`{${camelCasePlaceholder}}`, value);
+
+			if (/^\d+$/.test(value)) { // Se o valor do dataset é um número (para pluralização)
+                const numValue = parseInt(value, 10);
+                // Tenta o padrão {KEY[singular|plural]}
+                const pluralRegex = new RegExp(`\\{(${snakeCasePlaceholder}|${camelCasePlaceholder})\\s*\\[\\s*([^|\\]]+?)\\s*\\|\\s*([^|\\]]+?)\\s*\\]\\}`, "g");
+                translation = translation.replace(pluralRegex, (match, pKey, singular, plural) => {
+                    return numValue === 1 ? singular : plural;
+                });
+                
+                // Fallback para a lógica de [s]
+                if (numValue === 1) {
+                    translation = translation.replace(/\[s\]/g, "").replace(/\[es\]/g, "");
+                } else {
+                    translation = translation.replace(/\[s\]/g, "s").replace(/\[es\]/g, "es");
+                }
+                // Remove qualquer [texto] restante que não foi processado pela pluralização
+                translation = translation.replace(/\[[^\]]+\]/g, "");
 			}
 		}
 	});
 	return translation;
 }
-function translateCurrentLanguage(translationKey) {
-	if(!languageSelector) {
-		return undefined;
-	}
-	let translation = translate(translationKey, languageSelector.value);
-	if(!translation) {
+
+function translateCurrentLanguage(translationKey, fallbackString = null) {
+    let currentLang = "en_US"; 
+    if(languageSelector && languageSelector.value && languageSelector.value !== "") {
+        currentLang = languageSelector.value;
+    }
+
+	let translation = translate(translationKey, currentLang);
+	if(translation === undefined) {
 		translation = translate(translationKey, "en_US");
-		if(translation) {
-			console.warn(`Couldn't find translation for ${translationKey} for language ${languageSelector.value}!`);
-		} else {
-			console.warn(`Couldn't find translation for ${translationKey} for language ${languageSelector.value} or English!`);
-			translation = translationKey;
+		if(translation === undefined) {
+            if (translationKey !== fallbackString) { // Evitar log recursivo de fallback para si mesmo
+			    // console.warn(`Translation key "${translationKey}" not found in ${currentLang} or en_US. Using fallback: "${fallbackString ?? translationKey}"`);
+            }
+			translation = fallbackString ?? translationKey;
 		}
 	}
 	return translation;
 }
 
 async function temporarilyChangeText(el, translationKey, duration = 2000) {
-	let originalTranslationKey = el.dataset.translate;
+    if (!el) return;
+	let originalTextContent = el.textContent;
+    let originalDatasetTranslate = el.dataset.translate;
+
 	el.dataset.translate = translationKey;
-	el.setAttribute("disabled", "");
+    if (languageSelector?.value) await translatePage(languageSelector.value); 
+	
+    el.setAttribute("disabled", "");
 	await sleep(duration);
-	el.dataset.translate = originalTranslationKey;
+
+    if (originalDatasetTranslate) {
+	    el.dataset.translate = originalDatasetTranslate;
+        if (languageSelector?.value) await translatePage(languageSelector.value);
+    } else {
+        el.removeAttribute("data-translate");
+        el.textContent = originalTextContent;
+    }
 	el.removeAttribute("disabled");
 }
-/**
- * Validates a file input based on the value of the `accept` attribute. Only works when `accept` is a comma-separated list of file extensions, not for MIME types.
- * @param {HTMLInputElement} fileInput
- * @returns {Boolean}
- */
+
 function validateFileInputFileTypes(fileInput) {
-	let acceptableFileExtensions = fileInput.accept.split(",");
-	let valid = Array.from(fileInput.files).every(file => acceptableFileExtensions.some(fileExtension => file.name.endsWith(fileExtension)));
+    if (!fileInput || !fileInput.accept) return true;
+	let acceptableFileExtensions = fileInput.accept.split(",").map(ext => ext.trim().toLowerCase());
+	let valid = Array.from(fileInput.files).every(file => {
+        const fileNameLower = file.name.toLowerCase();
+        return acceptableFileExtensions.some(fileExtension => fileNameLower.endsWith(fileExtension));
+    });
 	if(valid) {
 		fileInput.setCustomValidity("");
 	} else {
-		if(languageSelector) {
-			fileInput.setCustomValidity(translateCurrentLanguage("upload.error.wrong_file_type").replace("{FILE_TYPE}", joinOr(acceptableFileExtensions, languageSelector.value)));
-		} else {
-			fileInput.setCustomValidity(`Please upload only ${joinOr(acceptableFileExtensions)} files.`);
-		}
+        const langValue = languageSelector?.value || "en_US";
+        const translatedError = translateCurrentLanguage("upload.error.wrong_file_type", "Please upload only {FILE_TYPE} files.");
+		fileInput.setCustomValidity(
+            translatedError.replace("{FILE_TYPE}", joinOr(acceptableFileExtensions, langValue))
+        );
 	}
 	return valid;
 }
 
-/**
- * @param {Array<File>} structureFiles
- * @param {Array<LocalResourcePack>} localResourcePacks
- * @returns {Promise<void>}
- */
-async function makePack(structureFiles, localResourcePacks) {
-	// this is a mess. all it does is get the settings, call HoloPrint.makePack(), and show the download button.
-	generatePackFormSubmitButton.disabled = true;
-	
-	if(IN_PRODUCTION) {
-		console.debug("User agent:", navigator.userAgent);
-	}
-	
-	let formData = new FormData(generatePackForm);
-	let authors = formData.get("author").split(",").map(x => x.trim()).removeFalsies();
-	/** @type {import("./HoloPrint.js").HoloPrintConfig} */
-	let config = {
-		IGNORED_BLOCKS: formData.get("ignoredBlocks").split(/\W/).removeFalsies(),
-		SCALE: formData.get("scale") / 100,
-		OPACITY: formData.get("opacity") / 100,
-		MULTIPLE_OPACITIES: formData.get("opacityMode") == "multiple",
-		TINT_COLOR: formData.get("tintColor"),
-		TINT_OPACITY: formData.get("tintOpacity") / 100,
-		MINI_SCALE: +formData.get("miniSize"),
-		TEXTURE_OUTLINE_WIDTH: +formData.get("textureOutlineWidth"),
-		TEXTURE_OUTLINE_COLOR: formData.get("textureOutlineColor"),
-		TEXTURE_OUTLINE_OPACITY: formData.get("textureOutlineOpacity") / 100,
-		SPAWN_ANIMATION_ENABLED: !!formData.get("spawnAnimationEnabled"),
-		PLAYER_CONTROLS_ENABLED: !!formData.get("playerControlsEnabled"),
-		MATERIAL_LIST_ENABLED: !!formData.get("materialListEnabled"),
-		RETEXTURE_CONTROL_ITEMS: !!formData.get("retextureControlItems"),
-		RENAME_CONTROL_ITEMS: !!formData.get("renameControlItems"),
-		CONTROLS: Object.fromEntries([...formData].filter(([key]) => key.startsWith("control.")).map(([key, value]) => [key.replace(/^control./, ""), JSON.parse(value)])),
-		INITIAL_OFFSET: [+formData.get("initialOffsetX"), +formData.get("initialOffsetY"), +formData.get("initialOffsetZ")],
-		BACKUP_SLOT_COUNT: +formData.get("backupSlotCount"),
-		PACK_NAME: formData.get("packName") || undefined,
-		PACK_ICON_BLOB: formData.get("packIcon").size? formData.get("packIcon") : undefined,
-		AUTHORS: authors,
-		DESCRIPTION: formData.get("description") || undefined,
-		COMPRESSION_LEVEL: +formData.get("compressionLevel")
-	};
-	
-	let previewCont = document.createElement("div");
-	previewCont.classList.add("previewCont");
-	completedPacksCont.prepend(previewCont);
-	let infoButton = document.createElement("button");
-	infoButton.classList.add("packInfoButton"); // my class naming is terrible
-	infoButton.dataset.translate = "progress.generating";
-	completedPacksCont.prepend(infoButton);
-	
-	let resourcePackStack = await new ResourcePackStack(localResourcePacks);
-	
-	let pack;
-	logger?.setOriginTime(performance.now());
-	
-	let generationFailedError; // generation failed or generational failure?
-	if(ACTUAL_CONSOLE_LOG) {
-		pack = await HoloPrint.makePack(structureFiles, config, resourcePackStack, previewCont);
-	} else {
-		try {
-			pack = await HoloPrint.makePack(structureFiles, config, resourcePackStack, previewCont);
-		} catch(e) {
-			console.error(`Pack creation failed!\n${e}`);
-			if(!(e instanceof UserError)) {
-				generationFailedError = e;
-			}
-			if(!(e instanceof DOMException)) { // DOMExceptions can also be thrown, which don't have stack traces and hence can't be tracked if caught. HOWEVER they extend Error...
-				console.debug(getStackTrace(e).join("\n"));
-			}
-		}
-	}
-	
-	infoButton.classList.add("finished");
-	if(pack) {
-		infoButton.dataset.translate = "download";
-		infoButton.classList.add("completed");
-		let hasLoggedPackCreation = false;
-		infoButton.onclick = () => {
-			if(!hasLoggedPackCreation && IN_PRODUCTION) {
-				supabaseLogger ??= new SupabaseLogger(supabaseProjectUrl, supabaseApiKey);
-				supabaseLogger.recordPackCreation(structureFiles);
-				hasLoggedPackCreation = true;
-			}
-			downloadBlob(pack, pack.name);
-		};
-	} else {
-		if(generationFailedError) {
-			let bugReportAnchor = document.createElement("a");
-			bugReportAnchor.classList.add("buttonlike", "packInfoButton", "reportIssue");
-			bugReportAnchor.href = `https://github.com/SuperLlama88888/holoprint/issues/new?template=1-pack-creation-error.yml&title=Pack creation error: ${encodeURIComponent(generationFailedError.toString().replaceAll("\n", " "))}&version=${HoloPrint.VERSION}&logs=${encodeURIComponent(JSON.stringify(selectEl("simple-logger").allLogs))}`;
-			bugReportAnchor.target = "_blank";
-			bugReportAnchor.dataset.translate = "pack_generation_failed.report_github_issue";
-			infoButton.parentNode.replaceChild(bugReportAnchor, infoButton);
-		} else {
-			infoButton.classList.add("failed");
-			infoButton.dataset.translate = "pack_generation_failed";
-		}
-	}
-	
-	generatePackFormSubmitButton.disabled = false;
+async function makePackAndHandleUI(structureFiles, configObject, resourcePackStackInstance) {
+    if (!generatePackFormSubmitButton || !completedPacksCont) return;
+    generatePackFormSubmitButton.disabled = true;
+
+    if (IN_PRODUCTION && supabaseLogger) {
+        console.debug("User agent:", navigator.userAgent);
+    }
+
+    // Limpa apenas se houver algo para limpar, e somente o conteúdo direto, não o próprio container
+    while (completedPacksCont.firstChild) {
+        completedPacksCont.removeChild(completedPacksCont.firstChild);
+    }
+
+    let previewCont = document.createElement("div");
+    previewCont.classList.add("previewCont");
+    // Não adiciona ao DOM ainda, só se o pack for gerado e o preview for necessário.
+
+    let infoButton = document.createElement("button");
+    infoButton.classList.add("packInfoButton");
+    infoButton.dataset.translate = "progress.generating";
+    completedPacksCont.appendChild(infoButton); // Adiciona ao DOM para que possa ser traduzido
+    
+    if (languageSelector?.value && initialTranslationsApplied) { // Traduz o botão de progresso
+         await translatePage(languageSelector.value);
+    }
+
+
+    if (logger) logger.setOriginTime(performance.now());
+
+    let pack;
+    let generationFailedError;
+    try {
+        // Passa o previewCont para makePack, que decidirá se e como usá-lo.
+        pack = await HoloPrint.makePack(structureFiles, configObject, resourcePackStackInstance, previewCont);
+    } catch (e) {
+        console.error(`Pack creation failed!`, e); 
+        if (!(e instanceof UserError)) {
+            generationFailedError = e;
+        }
+    }
+    
+    // Se o previewCont foi populado por HoloPrint.makePack, ele já está no DOM
+    // Se não, e precisarmos dele para mensagem de erro, podemos adicionar aqui.
+    // Se previewCont foi preenchido, não precisamos adicionar mais nada, a menos que seja a barra de progresso.
+    // A lógica de remover/esconder a barra de progresso deve estar aqui.
+    // Exemplo:
+    // const progressBar = document.getElementById('minhaBarraDeProgresso');
+    // if (progressBar) progressBar.style.display = 'none';
+
+
+    infoButton.classList.add("finished"); // Marcar como finalizado (sucesso ou falha)
+    // infoButton.classList.remove("progress"); // Se você usava uma classe 'progress'
+
+    if (pack) {
+        // Se o previewCont foi usado, ele já está no DOM
+        // Se não, e o pack foi gerado, pode-se remover o previewCont vazio ou deixar.
+        // O código atual do HoloPrint.js adiciona o previewCont ao DOM se ele for usado.
+        
+        infoButton.dataset.translate = "download";
+        if (languageSelector?.value) await translatePage(languageSelector.value);
+        infoButton.classList.add("completed");
+        let hasLoggedPackCreation = false;
+        infoButton.onclick = () => {
+            if (!hasLoggedPackCreation && IN_PRODUCTION && supabaseLogger) {
+                supabaseLogger.recordPackCreation(structureFiles);
+                hasLoggedPackCreation = true;
+            }
+            downloadBlob(pack, pack.name);
+        };
+    } else {
+        // Se houve falha, remover o previewCont se estiver vazio, ou deixar a mensagem de erro que o PreviewRenderer possa ter colocado.
+        if (previewCont.childNodes.length === 0 && previewCont.parentNode === completedPacksCont) {
+            completedPacksCont.removeChild(previewCont);
+        }
+
+        infoButton.classList.remove("completed"); 
+        if (generationFailedError) {
+            let bugReportAnchor = document.createElement("a");
+            bugReportAnchor.classList.add("buttonlike", "packInfoButton", "reportIssue", "finished");
+            const logsForReport = selectEl("simple-logger")?.allLogs ?? [];
+            bugReportAnchor.href = `https://github.com/SuperLlama88888/holoprint/issues/new?template=1-pack-creation-error.yml&title=Pack creation error: ${encodeURIComponent(generationFailedError.toString().replaceAll("\n", " "))}&version=${HoloPrint.VERSION}&logs=${encodeURIComponent(JSON.stringify(logsForReport))}`;
+            bugReportAnchor.target = "_blank";
+            bugReportAnchor.dataset.translate = "pack_generation_failed.report_github_issue";
+            
+            if (infoButton.parentNode) {
+                infoButton.parentNode.replaceChild(bugReportAnchor, infoButton);
+            } else {
+                 completedPacksCont.prepend(bugReportAnchor);
+                 if(infoButton) infoButton.remove(); // Remove o botão de progresso antigo
+            }
+            if (languageSelector?.value) await translatePage(languageSelector.value);
+        } else {
+            infoButton.classList.add("failed");
+            infoButton.dataset.translate = "pack_generation_failed";
+            if (languageSelector?.value) await translatePage(languageSelector.value);
+        }
+    }
+    generatePackFormSubmitButton.disabled = false;
 }
