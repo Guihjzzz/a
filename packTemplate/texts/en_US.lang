@@ -1,13 +1,23 @@
-pack.description=§u★HoloPrint§r resource pack generated on §o{PACK_GENERATION_TIME}§r\nDeveloped by §l§6SuperLlama88888§r{AUTHORS_SECTION}{DESCRIPTION_SECTION}{DISABLED_FEATURES_SECTION}{CONTROLS_SECTION}\n\n§lTotal block count: {TOTAL_MATERIAL_COUNT}\n§r{MATERIAL_LIST}	## ★ at the start forces unicode font which makes it smaller so more text fits in
-pack.description.authors=\nStructure made by {STRUCTURE_AUTHORS[ and ]}	## Authors/Description/Controls will be substituted into the actual description by the JS
-pack.description.description=\n{DESCRIPTION}
-pack.description.disabled_features=\n§4§o{DISABLED_FEATURES}§r
-pack.description.controls=\n\n§lControls:§r{CONTROLS}
+pack.name={PACK_NAME} - §l§bHolo§dLab§r
+pack.description=§r\nDeveloped by §l§btik§dtok §cGuihjzzz§r\n\n§lTotal block count: {TOTAL_MATERIAL_COUNT}\n§r{MATERIAL_LIST}
 
+# Esta chave ainda é necessária para o título da lista de materiais no HUD do jogo, se habilitada
+holoprint.material_list.heading=Material List: {PACK_NAME}
+
+# Chave para o texto de truncamento da lista de materiais (se necessário)
+pack.description.and_more_materials=... and more materials.
+
+# As seguintes chaves de template de seção não são mais necessárias para pack.description,
+# mas podem ser mantidas se você planeja usá-las para outros fins ou para referência.
+# Se não, podem ser removidas deste arquivo.
+# pack.description.authors_template=\nStructure made by {STRUCTURE_AUTHORS}
+# pack.description.user_description_template=\n{DESCRIPTION}
+# pack.description.disabled_features_template=\n§4§o{DISABLED_FEATURES}§r
+# pack.description.controls_template=\n\n§lControls:§r{CONTROLS}
+
+# Traduções para funcionalidades desabilitadas (ainda podem ser úteis se você quiser exibi-las em outro lugar)
 pack.description.spawn_animation_disabled=Spawn animation disabled
 pack.description.player_controls_disabled=Player controls disabled
 pack.description.material_list_disabled=Material list disabled
 pack.description.retextured_control_items_disabled=Retextured control items disabled
 pack.description.renamed_control_items_disabled=Renamed control items disabled
-
-holoprint.material_list.heading=Material List: {PACK_NAME}
