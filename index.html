@@ -4,23 +4,62 @@
 		<title data-translate="app_name">HoloLab</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta name="description" content="Create MCBE resource packs to display structures as holograms in-game with HoloLab.">
-		<meta name="keywords" content="hololab, minecraft bedrock, holograms, litematica, schematica, guihjzzz">
+		<meta name="description" content="Create MCBE resource packs to display structures as holograms in-game with HoloLab. Similar to Litematica.">
+		<meta name="keywords" content="hololab, minecraft bedrock, holograms, litematica, schematica, guihjzzz, mcpe, mcbe">
 		
-		<meta property="og:url" content="YOUR_HOLOLAB_URL_HERE">
+		<meta property="og:url" content="https://guihjzzz.github.io/HoloLab/"> <!-- MODIFIQUE CONFORME NECESSÁRIO -->
 		<meta property="og:type" content="website">
 		<meta property="og:title" content="HoloLab">
 		<meta property="og:description" content="Create MCBE resource packs to display structures as holograms in-game with HoloLab.">
-		<meta property="og:image" content="assets/guihjzzz.png"> <!-- SEU LOGO -->
+		<meta property="og:image" content="https://raw.githubusercontent.com/Holo-Lab/holo/main/ChatGPT%20Image%203%20de%20jun.%20de%202025%2C%2008_40_34.png">
 		<meta property="og:image:width" content="192">
 		<meta property="og:image:height" content="192">
+		<meta property="og:image" content="https://raw.githubusercontent.com/Holo-Lab/holo/main/1748951676116.png">
+        <meta property="og:image:width" content="720">
+		<meta property="og:image:height" content="210">
+
+
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "WebApplication",
+				"name": "HoloLab",
+				"url": "https://guihjzzz.github.io/HoloLab/",
+				"description": "Create MCBE resource packs to display structures as holograms in-game with HoloLab. Similar to Litematica or Schematica.",
+				"applicationCategory": "UtilitiesApplication",
+				"browserRequirements": "Requires JavaScript",
+				"operatingSystem": "All",
+				"keywords": "hololab, litematica bedrock, minecraft bedrock, esquemáticos, construção mcpe, guihjzzz",
+				"image": "https://raw.githubusercontent.com/Holo-Lab/holo/main/ChatGPT%20Image%203%20de%20jun.%20de%202025%2C%2008_40_34.png",
+				"author": {
+					"@type": "Person",
+					"name": "Guihjzzz",
+					"url": "https://github.com/Guihjzzz"
+				},
+				"hasPart": [
+					{
+						"@type": "WebPage",
+						"url": "https://www.tiktok.com/@guihjzzz",
+						"name": "Guihjzzz no TikTok"
+					},
+                    {
+						"@type": "WebPage",
+						"url": "https://discord.gg/YTdKsTjnUy",
+						"name": "Comunidade HoloLab no Discord"
+					}
+				],
+				"offers": {
+					"@type": "Offer",
+					"price": "0"
+				}
+			}
+		</script>
 		
 		<link rel="manifest" href="manifest.webmanifest"/>
-		<link rel="icon" sizes="48x48" href="assets/guihjzzz.png"/>
-		<link rel="icon" sizes="192x192" href="assets/guihjzzz.png"/>
+		<link rel="icon" sizes="any" href="https://raw.githubusercontent.com/Holo-Lab/holo/main/ChatGPT%20Image%203%20de%20jun.%20de%202025%2C%2008_40_34.png" type="image/png"/>
 		
-		<link rel="stylesheet" href="https://fonts.bunny.net/css?family=catamaran:400,500,700&display=swap"/>
-		<link rel="stylesheet" href="assets/MaterialSymbols.css"/>
+		<link rel="stylesheet" href="https://fonts.bunny.net/css?family=catamaran:400,500,600,700&display=swap"/> <!-- Ajustado peso da fonte -->
+		<link rel="stylesheet" href="assets/MaterialSymbols.css"/> <!-- Mantenha se usar ícones Material -->
 		
 		<link rel="stylesheet" href="index.css"/>
 		<script type="importmap">
@@ -44,17 +83,20 @@
 	<body>
         <header id="appHeader">
             <div class="logo-container">
-                <img src="assets/guihjzzz.png" alt="HoloLab Logo" id="headerLogo"/>
+                <img src="https://raw.githubusercontent.com/Holo-Lab/holo/main/ChatGPT%20Image%203%20de%20jun.%20de%202025%2C%2008_40_34.png" alt="HoloLab Logo" id="headerLogo"/>
                 <span class="header-title" data-translate="app_name">HoloLab</span>
             </div>
             <nav class="header-nav">
-                <a href="YOUR_TIKTOK_URL" target="_blank" data-translate="link.tiktok">TikTok</a>
-                <a href="YOUR_DISCORD_URL" target="_blank" data-translate="link.discord">Discord</a>
+                <a href="https://www.tiktok.com/@guihjzzz?_t=ZM-8vawBdE0Ew2&_r=1" target="_blank" data-translate="link.tiktok"><span class="material-symbols">music_note</span>TikTok</a>
+                <a href="https://discord.gg/YTdKsTjnUy" target="_blank" data-translate="link.discord"><span class="material-symbols">discord</span>Discord</a>
+                <!-- Adicionar mais links se necessário, como para GitHub -->
+                 <a href="https://github.com/Guihjzzz/HoloLab" target="_blank" data-translate="link.github"><span class="material-symbols">code_blocks</span>GitHub</a>
             </nav>
-            <div id="languageSelectorCont" title="Change language" data-translate-title="change_language">
-                <div id="languageSelectorButton"></div>
+            <div id="languageSelectorContainer">
+                 <span class="material-symbols" id="languageIcon">translate</span>
                 <select id="languageSelector">
                     <option value="en_US">English</option>
+                    <!-- Outras opções serão populadas pelo JS -->
                 </select>
             </div>
         </header>
@@ -66,40 +108,42 @@
 			</section>
 
 			<form action="javascript:" id="generatePackForm">
-                <section class="upload-section" id="uploadStructureFileSection">
+                <section class="upload-section card-style" id="uploadStructureFileSection">
                     <h2 data-translate="upload_section.title">Upload Structure File</h2>
                     <p data-translate="upload_section.description">Select a .mcstructure file to generate your hologram pack</p>
                     
-                    <div class="drag-drop-area">
+                    <label for="structureFilesInput" class="drag-drop-area">
                         <span class="material-symbols">upload_file</span>
                         <p data-translate="upload.drag_drop_text">Click to select or drag and drop your .mcstructure file</p>
                         <input type="file" accept=".mcstructure" multiple form="" autocomplete="off" id="structureFilesInput" class="file-input-overlay"/>
-                    </div>
-                    <span class="hidden" id="notStructureFileError" data-translate="structure_files.error">Please upload only <code>.mcstructure</code> files.</span>
+                    </label>
+                    <span class="hidden validation-message" id="notStructureFileError" data-translate="structure_files.error"></span>
 
                     <details class="alternative-uploads">
                         <summary><span data-translate="extract_from_world.heading_alternative">Alternative Upload Methods</span></summary>
-                        <fieldset class="alt-upload-options">
-                            <legend data-translate="extract_from_world.upload">Upload world file (<code>*.mcworld</code>, <code>*.zip</code>)</legend>
-                            <label>
-                                <input type="file" accept=".mcworld,.zip" form="" autocomplete="off" id="worldFileInput"/>
-                                <div class="buttonlike small-button"><p data-translate="upload.button.world">Upload World</p></div>
-                            </label>
-                            <span class="hidden" id="worldExtractionMessage" data-translate="extract_from_world.extracting">Extracting...</span>
-                            <span class="hidden" id="worldExtractionSuccess" data-translate="extract_from_world.success"></span>
-                            <span class="hidden" id="worldExtractionError" data-translate="extract_from_world.error">No structures found!</span>
-                            <span class="hidden" id="worldExtractionWorldError" data-translate="extract_from_world.world_error"></span>
-                        </fieldset>
-                        <fieldset class="alt-upload-options">
-                            <legend data-translate="update_pack.upload">Upload old HoloLab/Structura pack (<code>*.mcpack</code>)</legend>
-                            <label>
-                                <input type="file" accept=".mcpack" form="" autocomplete="off" id="oldPackInput"/>
-                                <div class="buttonlike small-button"><p data-translate="upload.button.old_pack">Upload Pack</p></div>
-                            </label>
-                            <span class="hidden" id="oldPackExtractionMessage" data-translate="update_pack.extracting">Extracting...</span>
-                            <span class="hidden" id="oldPackExtractionSuccess" data-translate="update_pack.success">Found files!</span>
-                            <span class="hidden" id="oldPackExtractionError" data-translate="update_pack.error">Not a HoloLab pack!</span>
-                        </fieldset>
+                        <div class="alternative-uploads-content">
+                            <fieldset class="alt-upload-options">
+                                <legend data-translate="extract_from_world.upload">Upload world file (<code>*.mcworld</code>, <code>*.zip</code>)</legend>
+                                <label class="button-like-label">
+                                    <span data-translate="upload.button.world">Upload World</span>
+                                    <input type="file" accept=".mcworld,.zip" form="" autocomplete="off" id="worldFileInput"/>
+                                </label>
+                                <span class="hidden validation-message" id="worldExtractionMessage" data-translate="extract_from_world.extracting"></span>
+                                <span class="hidden validation-message success" id="worldExtractionSuccess" data-translate="extract_from_world.success"></span>
+                                <span class="hidden validation-message error" id="worldExtractionError" data-translate="extract_from_world.error"></span>
+                                <span class="hidden validation-message error" id="worldExtractionWorldError" data-translate="extract_from_world.world_error"></span>
+                            </fieldset>
+                            <fieldset class="alt-upload-options">
+                                <legend data-translate="update_pack.upload">Upload old HoloLab/Structura pack (<code>*.mcpack</code>)</legend>
+                                <label class="button-like-label">
+                                    <span data-translate="upload.button.old_pack">Upload Pack</span>
+                                    <input type="file" accept=".mcpack" form="" autocomplete="off" id="oldPackInput"/>
+                                </label>
+                                <span class="hidden validation-message" id="oldPackExtractionMessage" data-translate="update_pack.extracting"></span>
+                                <span class="hidden validation-message success" id="oldPackExtractionSuccess" data-translate="update_pack.success"></span>
+                                <span class="hidden validation-message error" id="oldPackExtractionError" data-translate="update_pack.error"></span>
+                            </fieldset>
+                        </div>
                     </details>
                 </section>
 
@@ -107,11 +151,9 @@
 					<input type="file" accept=".mcstructure" multiple required name="structureFiles" id="structureFilesList"/>
 				</file-input-table>
 
-                <!-- Todas as configurações do HoloPrint vão aqui, possivelmente dentro de um <details> ou um contêiner que aparece após o upload -->
-                <details id="allSettingsContainer" class="collapsible-settings">
+                <details id="allSettingsContainer" class="collapsible-settings card-style">
                     <summary><h2 data-translate="all_settings.heading">Hologram Settings & Pack Options</h2></summary>
                     
-                    <!-- Manter a estrutura de abas do HoloPrint original DENTRO desta seção <details> -->
                     <div class="multiTabCont">
                         <input type="radio" checked name="configTabs" form="" id="settingsTab"/>
                         <label for="settingsTab" class="buttonlike" data-translate="settings.heading">Settings</label>
@@ -126,15 +168,15 @@
                                     </label>
                                     <label>
                                         <span data-translate="settings.theme.primary_color">Primary Accent Color:</span>
-                                        <input type="color" id="primaryColorPicker" value="#3B82F6"/> <!-- Azul da imagem -->
+                                        <input type="color" id="primaryColorPicker" value="#00a1ff"/>
                                     </label>
                                     <label>
-                                        <span data-translate="settings.theme.secondary_color">Secondary Accent Color:</span>
-                                        <input type="color" id="secondaryColorPicker" value="#10B981"/> <!-- Verde/Ciano para exemplo -->
+                                        <span data-translate="settings.theme.secondary_color">Secondary Accent Color (Optional):</span>
+                                        <input type="color" id="secondaryColorPicker" value="#D000FF"/> <!-- Exemplo de roxo/magenta -->
                                     </label>
                                      <label>
                                         <span data-translate="settings.theme.button_hover_color">Button Hover Color:</span>
-                                        <input type="color" id="buttonHoverColorPicker" value="#2563EB"/> <!-- Azul mais escuro para hover -->
+                                        <input type="color" id="buttonHoverColorPicker" value="#007acc"/>
                                     </label>
                                 </div>
                             </fieldset>
@@ -152,7 +194,7 @@
                                             <option value="0.5">0.5px</option>
                                             <option value="1">1px</option>
                                         </select></label>
-                                        <label><span data-translate="settings.textures.outline.color">Texture outline color:</span> <input type="color" value="#0000FF" name="textureOutlineColor"/></label>
+                                        <label><span data-translate="settings.textures.outline.color">Texture outline color:</span> <input type="color" value="#007acc" name="textureOutlineColor"/></label>
                                         <label><span data-translate="settings.textures.outline.opacity">Texture outline opacity:</span> <input type="number" min="10" max="100" value="65" name="textureOutlineOpacity"/>%</label>
                                     </div>
                                     <div id="texturePreviewCont">
@@ -204,7 +246,8 @@
                         <fieldset>
                             <legend data-translate="metadata.heading">Metadata</legend>
                             <label><span data-translate="metadata.pack_name">Pack name:</span> <code><input type="text" pattern="[^\/]*" name="packName"/></code></label>
-                            <label><span data-translate="metadata.pack_icon">Pack icon (<code>*.png</code>):</span> <input type="file" accept=".png" name="packIcon"/></label>
+                            <!-- Pack icon input é redundante se o ícone é fixo -->
+                            <!-- <label><span data-translate="metadata.pack_icon">Pack icon (`*.png`):</span> <input type="file" accept=".png" name="packIcon"/></label> -->
                             <label><span data-translate="metadata.structure_author">Structure author:</span> <input type="text" placeholder="Guihjzzz" name="author" data-translate-placeholder="metadata.structure_author.placeholder_hololab"/></label>
                             <label><span data-translate="metadata.description">Description:</span><br/><textarea placeholder="My epic HoloLab build!" rows="4" cols="20" name="description" data-translate-placeholder="metadata.description.placeholder_hololab"></textarea></label>
                             <div id="descriptionLinksCont"></div>
@@ -229,7 +272,7 @@
 			<div id="completedPacksCont"></div>
 			<simple-logger id="log"></simple-logger>
 		
-        </main> <!-- Fim do #mainContent -->
+        </main>
         
         <div id="dropFileNotice" class="hidden">
 			<h1 data-translate="upload.drop_file">Drop your files here</h1>
@@ -243,17 +286,16 @@
             <div class="footer-column">
                 <h3 data-translate="footer.links.title">Links</h3>
                 <ul>
-                    <li><a href="YOUR_GITHUB_REPO_URL_HERE" target="_blank" data-translate="footer.links.github">GitHub</a></li>
-                    <li><a href="YOUR_DISCORD_URL_HERE" target="_blank" data-translate="footer.links.discord">Discord</a></li>
-                    <li><a href="YOUR_TIKTOK_URL_HERE" target="_blank" data-translate="footer.links.tiktok">TikTok</a></li>
-                    <!-- Adicionar link para a Wiki aqui também -->
+                    <li><a href="https://github.com/Guihjzzz/HoloLab" target="_blank" data-translate="footer.links.github">GitHub</a></li>
+                    <li><a href="https://discord.gg/YTdKsTjnUy" target="_blank" data-translate="footer.links.discord">Discord</a></li>
+                    <li><a href="https://www.tiktok.com/@guihjzzz" target="_blank" data-translate="footer.links.tiktok">TikTok</a></li>
                     <li><a href="YOUR_HOLOLAB_WIKI_URL_HERE" target="_blank" data-translate="footer.links.wiki">Wiki</a></li>
                 </ul>
             </div>
             <div class="footer-column">
                 <h3 data-translate="footer.developer.title">Developer</h3>
                 <p data-translate="footer.developer.name">Developed by Guihjzzz</p>
-                <p data-translate="footer.developer.version">Version 1.0.0-HoloLab</p> <!-- Você pode querer dinamizar isso -->
+                <p data-translate="footer.developer.version_id">Version</p> <span data-translate="footer.developer.version">1.0.0-HoloLab</span>
             </div>
         </footer>
 	</body>
