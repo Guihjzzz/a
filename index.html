@@ -1,63 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title data-translate="app_name">HoloLab</title>
+		<title data-translate="app_name">HoloLab</title> 
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta name="description" content="Ferramenta de construção para Minecraft Bedrock, similar a Litematica ou Schematica. Crie pacotes de recursos para MCBE para exibir hologramas de esquemáticos. Facilite a construção no MCPE com HoloLab!">
+		<meta name="description" content="Ferramenta de construção para Minecraft Bedrock, similar a Litematica ou Schematica. Crie pacotes de recursos para MCBE para exibir hologramas de esquemáticos com HoloLab.">
 		<meta name="keywords" content="hololab, litematica bedrock, minecraft bedrock, esquemáticos, construção mcpe, guihjzzz">
 		
-		<meta property="og:url" content="https://guihjzzz.github.io/HoloLab/"> <!-- SUA URL -->
+		<meta property="og:url" content="YOUR_HOLOLAB_URL_HERE">
 		<meta property="og:type" content="website">
 		<meta property="og:title" content="HoloLab">
-		<meta property="og:description" content="Ferramenta de construção para Minecraft Bedrock, similar a Litematica ou Schematica. Crie pacotes de recursos para MCBE para exibir hologramas de esquemáticos. Facilite a construção no MCPE com HoloLab!">
-		<meta property="og:image" content="https://raw.githubusercontent.com/Holo-Lab/holo/main/1748951676116.png"> <!-- SEU BANNER -->
-		<meta property="og:image:width" content="720">
-		<meta property="og:image:height" content="210">
-		<meta property="og:image" content="https://raw.githubusercontent.com/Holo-Lab/holo/main/ChatGPT%20Image%203%20de%20jun.%20de%202025,%2008_40_34.png"> <!-- SEU LOGO -->
+		<meta property="og:description" content="Ferramenta de construção para Minecraft Bedrock, similar a Litematica ou Schematica. Crie pacotes de recursos para MCBE para exibir hologramas de esquemáticos com HoloLab.">
+		<meta property="og:image" content="assets/guihjzzz.png">
 		<meta property="og:image:width" content="192">
 		<meta property="og:image:height" content="192">
 		
-		<script type="application/ld+json">
-			{
-				"@context": "https://schema.org",
-				"@type": "WebApplication",
-				"name": "HoloLab",
-				"url": "https://guihjzzz.github.io/HoloLab/",
-				"description": "Ferramenta de construção para Minecraft Bedrock, similar a Litematica ou Schematica. Crie pacotes de recursos para MCBE para exibir hologramas de esquemáticos. Facilite a construção no MCPE com HoloLab!",
-				"applicationCategory": "UtilitiesApplication",
-				"browserRequirements": "Requires JavaScript",
-				"operatingSystem": "All",
-				"keywords": "hololab, litematica bedrock, minecraft bedrock, esquemáticos, construção mcpe, guihjzzz",
-				"image": "https://raw.githubusercontent.com/Holo-Lab/holo/main/ChatGPT%20Image%203%20de%20jun.%20de%202025,%2008_40_34.png",
-				"author": {
-					"@type": "Person",
-					"name": "Guihjzzz",
-					"url": "https://github.com/Guihjzzz"
-				},
-				"hasPart": [
-					{
-						"@type":"WebPage",
-						"url":"https://www.tiktok.com/@guihjzzz",
-						"name":"Guihjzzz no TikTok"
-					},
-					{
-						"@type":"WebPage",
-						"url":"https://discord.gg/YTdKsTjnUy",
-						"name":"Comunidade HoloLab no Discord"
-					}
-					// Adicione link para sua WIKI aqui
-				],
-				"offers": {
-					"@type": "Offer",
-					"price": "0"
-				}
-			}
-		</script>
-		<meta name="google-site-verification" content="KvFing8WMIePsj6J3Ed5BvcylweI7EL4D2lwVkKqcOE"> <!-- Pode remover se não for usar -->
-		
 		<link rel="manifest" href="manifest.webmanifest"/>
-		<link rel="icon" sizes="any" href="https://raw.githubusercontent.com/Holo-Lab/holo/main/ChatGPT%20Image%203%20de%20jun.%20de%202025,%2008_40_34.png"/> <!-- Favicon -->
+		<link rel="icon" sizes="any" href="assets/guihjzzz.png"/>
 		
 		<link rel="stylesheet" href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap"/>
 		<link rel="stylesheet" href="assets/MaterialSymbols.css"/>
@@ -82,16 +41,14 @@
 		<script src="index.js" type="module"></script>
 	</head>
 	<body>
-        <!-- Nova estrutura de cabeçalho inspirada no HoloLab -->
         <header id="appHeader">
             <div class="logo-container">
-                <img src="https://raw.githubusercontent.com/Holo-Lab/holo/main/ChatGPT%20Image%203%20de%20jun.%20de%202025,%2008_40_34.png" alt="HoloLab Logo" id="headerLogo"/>
+                <img src="assets/guihjzzz.png" alt="HoloLab Logo" id="headerLogo"/>
                 <span class="header-title" data-translate="app_name">HoloLab</span>
             </div>
             <nav class="header-nav">
                 <a href="https://www.tiktok.com/@guihjzzz" target="_blank" data-translate="link.tiktok">TikTok</a>
                 <a href="https://discord.gg/YTdKsTjnUy" target="_blank" data-translate="link.discord">Discord</a>
-                <!-- Adicionar mais links (GitHub, Wiki) aqui se desejar -->
             </nav>
             <div id="languageSelectorCont" title="Change language" data-translate-title="change_language">
                 <select id="languageSelector">
@@ -100,15 +57,11 @@
             </div>
         </header>
 
-		<main id="mainContent"> <!-- Alterado de <main> para <main id="mainContent"> -->
-			<section class="hero-section">
-				<h1 data-translate="hero.title">Build in Minecraft Bedrock with Holograms</h1>
-				<p data-translate="hero.subtitle">Create resource packs for MCBE to display structures as holograms in-game. Similar to Litematica or Schematica, but for Bedrock Edition.</p>
-			</section>
-			
-			<div id="responsiveWidthWrapper"> <!-- Este wrapper pode ser removido se o mainContent controlar a largura máxima -->
+		<main> <!-- O <main> original do HoloPrint -->
+			<h1 data-translate="app_name">HoloLab</h1> <!-- Este H1 será escondido pelo CSS, o do header prevalecerá -->
+			<div id="responsiveWidthWrapper">
 				<form action="javascript:" id="generatePackForm">
-				<fieldset class="main-fieldset card-style"> <!-- Adicionada classe para estilização de cartão -->
+				<fieldset> <!-- Este é o fieldset principal do HoloPrint original -->
 					<legend data-translate="generate_heading">Generate HoloLab resource pack (<code>*.mcpack</code>)</legend>
 						<div class="multiTabCont" id="structureFileInputCont">
 							<input type="radio" checked name="configTabs2" form="" id="structureFilesTab"/>
@@ -151,14 +104,14 @@
 							<input type="file" accept=".mcstructure" multiple required name="structureFiles" id="structureFilesList"/>
 						</file-input-table>
 						
-                        <!-- A estrutura de abas original do HoloPrint é mantida -->
+                        <!-- Abas de Configuração Originais do HoloPrint -->
 						<div class="multiTabCont all-settings-tabs">
 							<input type="radio" checked name="configTabs" form="" id="settingsTab"/>
 							<label for="settingsTab" class="buttonlike" data-translate="settings.heading">Settings</label>
 							<fieldset>
 								<legend data-translate="settings.heading">Settings</legend>
-                                <fieldset class="expandable"> <!-- Começa fechado por padrão -->
-                                    <legend><label><span data-translate="settings.theme.heading">Theme & Colors</span><input type="checkbox"/></label></legend>
+                                <fieldset class="expandable"> 
+                                    <legend><label><span data-translate="settings.theme.heading">Theme & Colors</span><input type="checkbox" checked/></label></legend> {/* Manter aberto por padrão */}
                                     <div>
                                         <label>
                                             <span data-translate="settings.theme.mode">Theme Mode:</span>
@@ -166,15 +119,15 @@
                                         </label>
                                         <label>
                                             <span data-translate="settings.theme.primary_color">Primary Accent Color:</span>
-                                            <input type="color" id="primaryColorPicker" value="#0EA5E9"/> <!-- Azul Ciano para tema escuro -->
+                                            <input type="color" id="primaryColorPicker" value="#0EA5E9"/>
                                         </label>
                                         <label>
                                             <span data-translate="settings.theme.secondary_color">Secondary Accent Color:</span>
-                                            <input type="color" id="secondaryColorPicker" value="#8B5CF6"/> <!-- Roxo/Magenta para tema escuro -->
+                                            <input type="color" id="secondaryColorPicker" value="#8B5CF6"/>
                                         </label>
                                          <label>
                                             <span data-translate="settings.theme.button_hover_color">Button Hover Color:</span>
-                                            <input type="color" id="buttonHoverColorPicker" value="#0284C7"/> <!-- Azul Ciano mais escuro para hover -->
+                                            <input type="color" id="buttonHoverColorPicker" value="#0284C7"/>
                                         </label>
                                     </div>
                                 </fieldset>
@@ -262,24 +215,17 @@
 								<button type="button" class="resetButton" data-translate="reset" data-reset-translation="resource_packs.reset">Reset</button>
 							</fieldset>
 						</div>
-						<!-- Fim da estrutura de abas original -->
-                </details> <!-- Fim de #allSettingsContainer -->
-
-				<button name="submit" id="generatePackButton" data-translate="generate">Generate HoloLab Pack</button>
-                
-                <!-- Barra de progresso (EXEMPLO, substitua pela sua implementação se diferente) -->
-                <div id="customProgressBarContainer" class="hidden"> 
-                    <div id="customProgressBar">0%</div>
-                </div>
-                <!-- Botão de Download/Erro será inserido aqui pelo JS -->
-				<div id="completedPacksCont"></div> 
-
-				<small id="termsOfUseNotice" data-translate="terms_of_use_notice">By generating a pack with HoloLab, you agree to the <a href="YOUR_TERMS_OF_USE_URL_HERE" target="_blank">Terms of Use</a>.</small>
-				</fieldset> <!-- Fechamento do fieldset principal do formulário -->
+						<button name="submit" id="generatePackButton" data-translate="generate">Generate HoloLab Pack</button>
+                        <div id="customProgressBarContainer" class="hidden"> 
+                            <div id="customProgressBar">0%</div>
+                        </div>
+						<div id="completedPacksCont"></div>
+						<small id="termsOfUseNotice" data-translate="terms_of_use_notice">By generating a pack with HoloLab, you agree to the <a href="YOUR_TERMS_OF_USE_URL_HERE" target="_blank">Terms of Use</a>.</small>
+				</fieldset>
 			</form>
 			<simple-logger id="log"></simple-logger>
-			</div> <!-- Fim de #responsiveWidthWrapper -->
-        </main> 
+			</div> 
+		</main> 
         
         <div id="dropFileNotice" class="hidden">
 			<h1 data-translate="upload.drop_file">Drop your files here</h1>
@@ -302,7 +248,7 @@
             <div class="footer-column">
                 <h3 data-translate="footer.developer.title">Developer</h3>
                 <p data-translate="footer.developer.name">Developed by Guihjzzz</p>
-                <p data-translate="footer.developer.version">Version 1.0.0-HoloLab</p>
+                <p data-translate="footer.developer.version" id="hololabVersion">Version 1.0.0-HoloLab</p> <!-- ID adicionado para possível atualização via JS -->
             </div>
         </footer>
 	</body>
