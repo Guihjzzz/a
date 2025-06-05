@@ -1,80 +1,93 @@
-/* HoloLab - index.css */
+/* HoloLab - index.css (Adaptado para nova estrutura HTML) */
 :root {
 	--icon-scale: 1;
-	--success-green: #3AB336;
-	--error-red: #E24436;
+	--success-green: #059669; /* Verde mais vibrante */
+	--error-red: #EF4444;   /* Vermelho mais vibrante */
 
-    /* --- Variáveis de Cor para Tema --- */
-    /* DEFAULT LIGHT THEME COLORS (Azulados) */
-    --primary-accent-color: #3B82F6;    /* Azul principal do design HoloLab */
-    --secondary-accent-color: #10B981;  /* Verde/Ciano para detalhes */
-    --button-background-color: #EFF6FF; /* Azul muito claro para botões/inputs */
-    --button-hover-background-color: #DBEAFE; 
-    --button-active-background-color: #BFDBFE;
-    --button-disabled-background-color: #E5E7EB;
-    --button-disabled-border-color: #D1D5DB;
-    --input-hover-background-color: #EBF4FF;
-    --text-color: #F9FAFB;             /* Texto claro (para fundo escuro do HoloLab) */
-    --text-color-darker: #9CA3AF;     /* Texto mais escuro/sutil (para parágrafos) */
-    --background-color: #111827;       /* Fundo do body bem escuro (HoloLab design) */
-    --card-background-color: #1F2937;   /* Fundo dos cards/seções */
-    --card-border-color: #374151;      /* Borda dos cards */
-	--body-bg-image-overlay: linear-gradient(rgba(17, 24, 39, 0.95), rgba(17, 24, 39, 0.95)); /* Overlay escuro */
-    --drag-drop-notice-bg: rgba(31, 41, 55, 0.8);
-    --checkbox-off-after-bg: #6B7280;
-    --checkbox-on-bg: var(--primary-accent-color);
-    --link-color: var(--secondary-accent-color); /* Ciano para links */
-    --link-visited-color: #059669; /* Ciano mais escuro para visitado */
-    --placeholder-color: #6B7280;
-    --description-links-color: var(--text-color-darker);
+    /* --- THEME COLORS (Padrão é Escuro, inspirado em lovable.dev) --- */
+    --primary-accent-color: #00A1FF;    /* Azul Ciano Vibrante para Destaque Principal */
+    --secondary-accent-color: #8A53E4;  /* Roxo/Magenta Sutil para Acento */
+    
+    --text-color: #E0E6F0;             /* Texto principal claro (quase branco) */
+    --text-color-muted: #9CA3AF;     /* Texto secundário/sutil (cinza claro) */
+    --text-color-darker: #6B7280;     /* Para placeholders ou texto ainda mais sutil */
+
+    --background-color: #111827;       /* Fundo do body (cinza-azulado muito escuro) */
+    --card-background-color: #1F2937;   /* Fundo de "cartões" e seções */
+    --card-border-color: #374151;      /* Borda sutil para cartões */
+    --input-background-color: #2D3748;  /* Fundo para inputs */
+    --input-border-color: #4B5563;     /* Borda para inputs */
+    --input-hover-background-color: #374151;
+    
+    --button-background-color: var(--primary-accent-color); /* Botões usam cor de destaque */
+    --button-text-color: #FFFFFF; /* Texto branco para botões com fundo de destaque */
+    --button-hover-background-color: #00BFFF; /* Azul ciano mais claro para hover */
+    --button-active-background-color: #007ACC; /* Azul ciano mais escuro para active */
+    
+    --button-secondary-background-color: #374151; /* Para botões secundários/alternativos */
+    --button-secondary-text-color: var(--text-color);
+    --button-secondary-hover-background-color: #4B5563;
+
+    --button-disabled-background-color: #2A2E37;
+    --button-disabled-border-color: #404752;
+    --button-disabled-text-color: #6B7280;
+
+	--body-bg-image-overlay: linear-gradient(rgba(17, 24, 39, 0.97), rgba(17, 24, 39, 0.97));
+    --drag-drop-notice-bg: rgba(31, 41, 55, 0.85);
+    
+    --checkbox-background: var(--input-background-color);
+    --checkbox-border: var(--primary-accent-color);
+    --checkbox-checked-bg: var(--primary-accent-color);
+    --checkbox-after-bg: var(--text-color); /* Cor do ícone do checkbox */
+    --checkbox-checked-after-bg: var(--button-text-color); /* Cor do ícone do checkbox checado */
+
+
+    --link-color: var(--secondary-accent-color); /* Roxo/magenta para links */
+    --link-visited-color: #6D28D9; /* Roxo mais escuro para visitado */
+    --link-hover-color: var(--primary-accent-color); /* Link hover com destaque azul */
+
+    --placeholder-color: var(--text-color-darker);
+    --description-links-color: var(--text-color-muted);
     --loader-color: var(--primary-accent-color);
-    --buttonlike-tab-active-bg: var(--button-hover-background-color);
+    
+    --tab-background-color: var(--input-background-color);
+    --tab-border-color: var(--card-border-color);
+    --tab-text-color: var(--text-color-muted);
+    --tab-active-background-color: var(--primary-accent-color);
+    --tab-active-text-color: var(--button-text-color);
+    --tab-hover-background-color: var(--input-hover-background-color);
+
     --packinfobutton-text-color: #FFFFFF;
     --packinfobutton-border-color: var(--primary-accent-color);
     --packinfobutton-bg-col1: var(--secondary-accent-color);
     --packinfobutton-bg-col2: var(--primary-accent-color);
-    --packinfobutton-failed-bg-col1: #EF4444; /* Vermelho mais vibrante para erro */
+    --packinfobutton-failed-bg-col1: #EF4444;
     --packinfobutton-failed-bg-col2: #DC2626;
 
-    /* Cores específicas para modo claro (se o tema claro for reintroduzido) */
-    --light-text-color: #1F2937;
-    --light-background-color: #F9FAFB;
-    --light-card-background-color: #FFFFFF;
-    --light-card-border-color: #E5E7EB;
-    --light-body-bg-image-overlay: linear-gradient(#F9FAFB, #F9FAFB);
+    --font-main: "Inter", "Catamaran", "Trebuchet MS", sans-serif; /* Nova fonte primária */
+    --font-monospace: monospace;
 
-}
+    --border-radius-sm: 0.375rem; /* 6px */
+    --border-radius-md: 0.5rem;  /* 8px */
+    --border-radius-lg: 0.75rem; /* 12px */
 
-/* --- DARK THEME (É O PADRÃO AGORA, MAS PODE SER USADO PARA ALTERNAR) --- */
-body.dark-mode { /* O :root já define um tema escuro, esta seção pode ser para variações futuras ou para forçar */
-    /* As variáveis do :root já são escuras. Se você quiser um tema claro alternativo, definirá aqui. */
-    /* Por exemplo, para um tema claro como alternativa: */
-    /*
-    --primary-accent-color: #4A90E2;
-    --secondary-accent-color: #50E3C2;
-    --text-color: var(--light-text-color);
-    --background-color: var(--light-background-color);
-    --card-background-color: var(--light-card-background-color);
-    --card-border-color: var(--light-card-border-color);
-    --body-bg-image-overlay: var(--light-body-bg-image-overlay);
-    --link-color: #007BFF;
-    --link-visited-color: #551A8B;
-    --button-background-color: #F0F8FF;
-    --button-hover-background-color: #DBEAFE;
-    */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
 }
 
 /* --- ESTILOS GERAIS --- */
 html {
     scroll-behavior: smooth;
-    font-size: 16px; /* Base para REMs */
+    font-size: 16px;
 }
 
 body {
-	background-image: var(--body-bg-image-overlay), url("assets/logo_background.png"); /* Mantenha sua imagem de fundo */
-	background-size: 100px; /* Ou ajuste conforme necessário */
+	background-image: var(--body-bg-image-overlay), url("assets/logo_background.png");
+	background-size: 120px; /* Ajustado para ser um pouco maior */
+    background-attachment: fixed; /* Para o padrão não rolar com a página */
     background-color: var(--background-color);
-	font-family: "Catamaran", "Trebuchet MS", sans-serif;
+	font-family: var(--font-main);
 	color: var(--text-color);
 	line-height: 1.6;
     margin: 0;
@@ -90,323 +103,309 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
-    background-color: var(--card-background-color); /* Um pouco diferente do fundo principal */
+    padding: 0.75rem 2rem; /* Padding ajustado */
+    background-color: rgba(31, 41, 55, 0.7); /* --card-background-color com mais transparência e efeito blur */
+    backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--card-border-color);
     position: sticky;
     top: 0;
     z-index: 1000;
+    box-shadow: var(--shadow-md);
 }
-.logo-container {
-    display: flex;
-    align-items: center;
-}
-#headerLogo {
-    height: 40px; /* Ajuste conforme o tamanho do seu logo */
-    width: auto;
-    margin-right: 0.75rem;
-    border: none; /* Remover borda padrão de img */
-    background: none; /* Remover fundo padrão de img */
-}
-.header-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-color);
-}
+.logo-container { display: flex; align-items: center; }
+#headerLogo { height: 36px; width: auto; margin-right: 0.75rem; border: none; background: none; }
+.header-title { font-size: 1.375rem; font-weight: 700; color: var(--text-color); }
 .header-nav a {
-    color: var(--text-color-darker);
-    text-decoration: none;
-    margin-left: 1.5rem;
-    font-weight: 500;
-    transition: color 0.2s ease-in-out;
+    color: var(--text-color-muted); text-decoration: none;
+    margin-left: 1.25rem; font-weight: 500; transition: color 0.2s;
 }
-.header-nav a:hover {
-    color: var(--primary-accent-color);
-}
-#languageSelectorCont { /* Ajustado para caber no header */
-    position: relative; /* Mudar de absolute */
-    top: auto; right: auto; /* Remover posicionamento absoluto */
-}
+.header-nav a:hover { color: var(--primary-accent-color); }
+
+#languageSelectorCont { position: relative; }
 #languageSelectorButton {
-    background: var(--text-color-darker); /* Ícone um pouco mais sutil */
+    display: none; /* Esconde o botão de ícone, o select será estilizado */
 }
-#languageSelector { /* Deixar select visível, estilizado como botão */
-    opacity: 1;
-    position: static;
-    background-color: var(--button-background-color);
+#languageSelector {
+    opacity: 1; position: static;
+    background-color: transparent;
+    color: var(--text-color-muted);
+    border: 1px solid transparent; /* Borda transparente para manter alinhamento */
+    border-radius: var(--border-radius-sm);
+    padding: 0.35em 0.5em;
+    font-family: var(--font-main);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+#languageSelector:hover {
+    background-color: var(--input-background-color);
+    border-color: var(--input-border-color);
     color: var(--text-color);
-    border: 1px solid var(--primary-accent-color);
-    border-radius: 5px;
-    padding: 0.25em 0.5em;
 }
+body.dark-mode #languageSelector { /* Garante cor de fundo do dropdown no dark mode */
+    background-color: var(--background-color) !important; /* Cor de fundo das opções */
+}
+body.dark-mode #languageSelector option {
+    background-color: var(--input-background-color);
+    color: var(--text-color);
+}
+
 
 /* --- CONTEÚDO PRINCIPAL --- */
-main#mainContent { /* Ajustes para o novo <main> */
-    flex-grow: 1; /* Faz o main ocupar o espaço restante até o footer */
-	margin: 0 auto; /* Centralizado, sem posicionamento absoluto */
-	padding: 2rem;
-	width: 100%;
-	max-width: 1200px; /* Largura máxima para o conteúdo */
+main#mainContent {
+    flex-grow: 1; margin: 0 auto; padding: 2rem;
+	width: 100%; max-width: 960px; /* Largura de conteúdo mais focada */
 	box-sizing: border-box;
-    /* Removido background, border, etc. pois o body cuida disso agora */
 }
 
-.hero-section {
-    text-align: center;
-    padding: 2rem 0 3rem;
-}
-.hero-section h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: var(--text-color); /* Texto principal claro */
-}
-.hero-section p {
-    font-size: 1.125rem;
-    color: var(--text-color-darker); /* Texto secundário um pouco mais escuro */
-    max-width: 600px;
-    margin: 0 auto;
-}
+.hero-section { text-align: center; padding: 2rem 0 3rem; }
+.hero-section h1 { font-size: clamp(1.75rem, 5vw, 2.75rem); font-weight: 700; margin-bottom: 0.75rem; color: var(--text-color); }
+.hero-section p { font-size: clamp(1rem, 2.5vw, 1.125rem); color: var(--text-color-muted); max-width: 650px; margin: 0 auto; }
 
 /* --- SEÇÃO DE UPLOAD --- */
 .upload-section {
     background-color: var(--card-background-color);
-    border-radius: 0.75rem; /* 12px */
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem; margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg);
     text-align: center;
 }
-.upload-section h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    color: var(--text-color);
-}
-.upload-section > p { /* Parágrafo de descrição abaixo do h2 */
-    color: var(--text-color-darker);
-    margin-bottom: 1.5rem;
-}
+.upload-section h2 { font-size: 1.5rem; font-weight: 600; margin-top: 0; margin-bottom: 0.5rem; color: var(--text-color); }
+.upload-section > p { color: var(--text-color-muted); margin-bottom: 1.5rem; }
 
 .drag-drop-area {
-    border: 2px dashed var(--primary-accent-color);
-    border-radius: 0.5rem;
-    padding: 2.5rem 1.5rem;
-    text-align: center;
-    cursor: pointer;
-    position: relative; /* Para o input overlay */
-    background-color: rgba(0,0,0,0.1); /* Fundo sutil para a área de drop */
-    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    border: 2px dashed var(--primary-accent-color); border-radius: var(--border-radius-md);
+    padding: 3rem 1.5rem; text-align: center; cursor: pointer; position: relative;
+    background-color: rgba(var(--primary-accent-color-rgb, 0, 161, 255), 0.05); /* Usa RGB da cor primária para transparência */
+    transition: background-color 0.2s, border-color 0.2s;
 }
 .drag-drop-area:hover {
-    background-color: rgba(0,0,0,0.15);
+    background-color: rgba(var(--primary-accent-color-rgb, 0, 161, 255), 0.1);
     border-color: var(--secondary-accent-color);
 }
-.drag-drop-area .material-symbols {
-    font-size: 3rem;
-    color: var(--primary-accent-color);
-    margin-bottom: 0.5rem;
-}
-.drag-drop-area p {
-    color: var(--text-color-darker);
-    margin: 0;
-}
-.file-input-overlay { /* Para tornar o input de arquivo invisível mas funcional */
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    opacity: 0;
-    cursor: pointer;
-}
+.drag-drop-area .material-symbols { font-size: 3.5rem; color: var(--primary-accent-color); margin-bottom: 0.75rem; display: block;}
+.drag-drop-area p { color: var(--text-color-muted); margin: 0; font-size: 0.9rem; }
+.file-input-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+
 .alternative-uploads {
-    margin-top: 1.5rem;
-    border: 1px solid var(--card-border-color);
-    border-radius: 0.5rem;
+    margin-top: 1.5rem; border: 1px solid var(--card-border-color); border-radius: var(--border-radius-md);
 }
 .alternative-uploads summary {
-    padding: 0.75rem 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    color: var(--text-color-darker);
-    border-radius: 0.5rem 0.5rem 0 0; /* Arredondar cantos superiores */
+    padding: 0.75rem 1rem; font-weight: 500; cursor: pointer; color: var(--text-color-muted);
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0; 
+    transition: background-color 0.2s;
 }
-.alternative-uploads[open] > summary {
-    background-color: rgba(0,0,0,0.05);
-}
-.alt-upload-options {
-    padding: 1rem;
-    border-top: 1px solid var(--card-border-color); /* Linha separadora */
-}
-.alt-upload-options legend {
-    font-weight: 500;
-    padding: 0 0.5em;
-    color: var(--text-color);
-}
+.alternative-uploads[open] > summary { background-color: rgba(var(--primary-accent-color-rgb, 0, 161, 255), 0.1); }
+.alt-upload-options { padding: 1rem; border-top: 1px solid var(--card-border-color); }
+.alt-upload-options legend { font-weight: 500; padding: 0 0.5em; color: var(--text-color); }
 .buttonlike.small-button {
-    display: inline-block;
-    padding: 0.5em 1em;
-    font-size: 0.9rem;
-    margin-top: 0.5em;
+    display: inline-block; padding: 0.5em 1em; font-size: 0.9rem; margin-top: 0.5em;
+    background-color: var(--button-secondary-background-color);
+    color: var(--button-secondary-text-color);
+    border-color: var(--card-border-color);
+}
+.buttonlike.small-button:hover {
+    background-color: var(--button-secondary-hover-background-color);
 }
 
-/* --- ESTRUTURA HOLOPRINT ORIGINAL DENTRO DE <details> --- */
-#allSettingsContainer {
+/* --- TABELA DE ARQUIVOS E CONFIGURAÇÕES --- */
+file-input-table {
+    display: block; /* Garante que o margin-top funcione */
+    margin-top: 1.5rem;
+    background-color: var(--card-background-color);
+    padding: 1rem;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+}
+body.dark-mode file-input-table { color: var(--text-color); }
+
+
+#allSettingsContainer { /* O <details> principal */
     background-color: var(--card-background-color);
     border: 1px solid var(--card-border-color);
-    border-radius: 0.75rem;
-    margin-top: 2rem;
-    padding: 0; /* O padding será nos filhos */
+    border-radius: var(--border-radius-lg);
+    margin-top: 2rem; padding: 0;
+    box-shadow: var(--shadow-lg);
 }
-#allSettingsContainer > summary { /* Estilo para o sumário principal das configurações */
-    padding: 1rem 1.5rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-    cursor: pointer;
-    border-radius: 0.75rem 0.75rem 0 0; /* Arredonda topo */
-    background-color: transparent;
+#allSettingsContainer > summary {
+    padding: 1rem 1.5rem; font-size: 1.25rem; font-weight: 600; cursor: pointer;
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    transition: background-color 0.2s;
+    display: flex; align-items: center; /* Para alinhar o ícone de expandir (adicionar via CSS se necessário) */
 }
 #allSettingsContainer[open] > summary {
-    background-color: rgba(0,0,0,0.1); /* Leve destaque quando aberto */
+    background-color: rgba(var(--primary-accent-color-rgb, 0,161,255), 0.1);
     border-bottom: 1px solid var(--card-border-color);
 }
-#allSettingsContainer .multiTabCont { /* Contêiner das abas originais */
+#allSettingsContainer .multiTabCont { padding: 1.5rem; }
+
+/* Abas dentro do container de settings */
+.multiTabCont > label.buttonlike {
+    background-color: var(--tab-background-color);
+    border: 1px solid var(--tab-border-color);
+    border-bottom: none;
+    color: var(--tab-text-color);
+    padding: 0.6em 1em;
+    margin: 0 -1px -1px 0; /* Para sobrepor bordas */
+    font-weight: 500;
+    border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
+}
+.multiTabCont > input[type="radio"]:checked + label.buttonlike {
+    background-color: var(--tab-active-background-color);
+    color: var(--tab-active-text-color);
+    border-color: var(--primary-accent-color); /* Borda de destaque na aba ativa */
+    position: relative; /* Para que a aba ativa pareça "acima" das outras */
+    z-index: 1;
+}
+.multiTabCont > input[type="radio"][name^="configTabs"]:not(:checked) + label.buttonlike:hover {
+    background-color: var(--tab-hover-background-color);
+}
+.multiTabCont > fieldset { /* Conteúdo da aba */
+    border: 1px solid var(--primary-accent-color); /* Borda de destaque no fieldset da aba ativa */
     padding: 1.5rem;
+    border-radius: 0 var(--border-radius-md) var(--border-radius-md) var(--border-radius-md);
+    background-color: var(--card-background-color); /* Fundo sutil para o conteúdo da aba */
 }
-/* Ajustes para os fieldsets dentro das abas */
-#allSettingsContainer .multiTabCont > fieldset {
-    background-color: transparent; /* Remove fundo duplicado */
-    border: 1px solid var(--fieldset-border-color); /* Mantém bordas */
-    padding: 1rem;
-    margin-top: 1rem;
-    border-radius: 0.5rem;
+
+
+/* Estilos para inputs e botões gerais (já definidos anteriormente, mas podem ser refinados aqui) */
+input, select, textarea, button, .buttonlike {
+    font-family: var(--font-main);
+    border-radius: var(--border-radius-md);
 }
-#allSettingsContainer .multiTabCont > label.buttonlike {
-    background-color: var(--button-background-color);
-    border: 1px solid var(--primary-accent-color);
+input[type="number"], input[type="text"], textarea, select {
+    background-color: var(--input-background-color);
+    border: 1px solid var(--input-border-color);
+    padding: 0.5em 0.75em;
     color: var(--text-color);
+    width: 100%; /* Fazem inputs ocuparem a largura disponível */
+    box-sizing: border-box; /* Garante que padding não aumente a largura total */
 }
-#allSettingsContainer .multiTabCont > input[type="radio"]:checked + label.buttonlike {
-    background-color: var(--buttonlike-tab-active-bg);
-    border-bottom-color: var(--buttonlike-tab-active-bg); /* Simula conexão */
-}
-
-
-/* BOTÃO DE GERAR E TERMOS */
-#generatePackButton {
-    display: block;
-    width: auto; /* Largura automática, centralizado pelo wrapper */
-    min-width: 250px; /* Largura mínima */
-    margin: 2rem auto 0.5rem; /* Centralizado e espaçado */
-    padding: 0.75rem 1.5rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--packinfobutton-text-color);
-    border: 2px solid var(--packinfobutton-border-color);
-    background-image: repeating-linear-gradient(150deg, var(--packinfobutton-bg-col1) 0, var(--packinfobutton-bg-col1) 10px, var(--packinfobutton-bg-col2) 10px, var(--packinfobutton-bg-col2) 20px);
-	background-size: 200%;
-    border-radius: 0.5rem;
-    transition: transform 0.1s ease-out, box-shadow 0.2s;
-}
-#generatePackButton:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
-}
-#generatePackButton:active {
-    transform: translateY(0px);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.25);
-}
-#termsOfUseNotice {
-    text-align: center;
-    font-size: 0.875rem;
-    color: var(--text-color-darker);
-    margin-top: 1rem;
-    margin-bottom: 2rem;
-}
-#termsOfUseNotice a {
-    color: var(--secondary-accent-color);
-    text-decoration: underline;
+input[type="number"]:focus, input[type="text"]:focus, textarea:focus, select:focus {
+    border-color: var(--primary-accent-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-accent-color-rgb, 0,161,255), 0.3);
+    outline: none;
 }
 
-/* PackInfoButton - quando o pack é gerado */
-.packInfoButton { /* Estilização similar ao botão de gerar */
-    color: var(--packinfobutton-text-color);
-    border: 2px solid var(--packinfobutton-border-color);
-    background-image: repeating-linear-gradient(150deg, var(--packinfobutton-bg-col1) 0, var(--packinfobutton-bg-col1) 10px, var(--packinfobutton-bg-col2) 10px, var(--packinfobutton-bg-col2) 20px);
-	background-size: 200%;
+button, .buttonlike, input[type="file"]::file-selector-button {
+    background-color: var(--button-secondary-background-color); /* Botões padrão são secundários */
+    color: var(--button-secondary-text-color);
+    border: 1px solid var(--card-border-color);
+    padding: 0.6em 1.2em;
+    font-weight: 500;
+    transition: background-color 0.2s, transform 0.1s;
 }
-.packInfoButton.failed, .packInfoButton.reportIssue {
-    color: #FFFFFF; /* Garante texto branco em botão de erro */
+button:hover, .buttonlike:hover, input[type="file"]::file-selector-button:hover {
+    background-color: var(--button-secondary-hover-background-color);
 }
+button:active, .buttonlike:active, input[type="file"]::file-selector-button:active {
+    transform: translateY(1px);
+}
+
+#generatePackButton, .packInfoButton.completed, .packInfoButton.reportIssue { /* Botões primários/de ação */
+    background-color: var(--primary-accent-color); /* Gradiente já definido no :root */
+    color: var(--button-text-color);
+    border-color: var(--primary-accent-color);
+}
+#generatePackButton:hover, .packInfoButton.completed:hover, .packInfoButton.reportIssue:hover {
+    background-color: var(--button-hover-background-color); /* Usa cor sólida para hover, ou ajusta gradiente */
+     background-image: repeating-linear-gradient(150deg, var(--button-hover-background-color) 0, var(--button-hover-background-color) 10px, var(--primary-accent-color) 10px, var(--primary-accent-color) 20px);
+}
+#generatePackButton:active, .packInfoButton.completed:active, .packInfoButton.reportIssue:active {
+    background-color: var(--button-active-background-color);
+    background-image: repeating-linear-gradient(150deg, var(--button-active-background-color) 0, var(--button-active-background-color) 10px, var(--primary-accent-color) 10px, var(--primary-accent-color) 20px);
+}
+
+.packInfoButton { /* Mantém animação original se a classe 'completed' for adicionada */
+    border-color: var(--packinfobutton-border-color);
+	background-image: repeating-linear-gradient(150deg, var(--packinfobutton-bg-col1) 0, var(--packinfobutton-bg-col1) 10px, var(--packinfobutton-bg-col2) 10px, var(--packinfobutton-bg-col2) 20px);
+}
+.packInfoButton:not(.finished) { cursor: wait; } /* Quando gerando */
+
+
+#termsOfUseNotice { margin-top: 1rem; text-align: center; font-size: 0.875rem; color: var(--text-color-muted); }
+#termsOfUseNotice a { color: var(--link-color); text-decoration: underline; }
+#termsOfUseNotice a:hover { color: var(--link-hover-color); }
+
+
+img:not(#languageSelectorButton):not(#headerLogo), .previewCont canvas { /* Exclui o logo do header */
+	display: inline-block;
+	width: 100%; /* Faz o preview ocupar a largura do container */
+    max-width: 400px; /* Limita o tamanho máximo */
+	border: 1px solid var(--card-border-color); /* Borda sutil */
+	background-image: url("assets/noise.svg"); /* Mantém o ruído */
+    background-color: var(--input-background-color); /* Fundo para o canvas */
+    border-radius: var(--border-radius-md);
+}
+
+.loader { --c: no-repeat linear-gradient(var(--loader-color) 0 0); }
+
 
 /* --- RODAPÉ --- */
 #appFooter {
     background-color: var(--card-background-color);
     border-top: 1px solid var(--card-border-color);
-    padding: 2rem;
+    padding: 2.5rem 2rem; /* Mais padding vertical */
     text-align: center;
-    color: var(--text-color-darker);
+    color: var(--text-color-muted);
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between; /* Altera para space-between se houver mais colunas */
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 2rem; /* Aumenta o gap */
+    margin-top: auto; /* Empurra para o final */
 }
 .footer-column {
     flex: 1;
-    min-width: 200px; /* Para não ficarem muito espremidas */
+    min-width: 220px;
     text-align: left;
 }
 .footer-column h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: 0.75rem;
+    font-size: 1.1rem; font-weight: 600; color: var(--text-color); margin-bottom: 1rem;
 }
-.footer-column p, .footer-column ul {
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-}
-.footer-column ul {
-    list-style: none;
-    padding-left: 0;
-}
-.footer-column ul li a {
-    color: var(--text-color-darker);
-    text-decoration: none;
-    transition: color 0.2s ease-in-out;
-}
-.footer-column ul li a:hover {
-    color: var(--primary-accent-color);
+.footer-column p, .footer-column ul { font-size: 0.9rem; margin-bottom: 0.5rem; line-height: 1.7; }
+.footer-column ul { list-style: none; padding-left: 0; }
+.footer-column ul li { margin-bottom: 0.4rem; }
+.footer-column ul li a { color: var(--text-color-muted); text-decoration: none; transition: color 0.2s; }
+.footer-column ul li a:hover { color: var(--primary-accent-color); }
+
+/* Responsividade adicional para o novo layout */
+@media (max-width: 768px) {
+    #appHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+    }
+    .logo-container { margin-bottom: 0.5rem; }
+    .header-nav { margin-top: 0.5rem; margin-left: 0; }
+    .header-nav a { margin-left: 0; margin-right: 1rem; }
+    #languageSelectorCont { margin-top: 0.5rem; align-self: flex-start; }
+
+    main#mainContent { padding: 1rem; }
+    .hero-section { padding: 1.5rem 0 2rem; }
+    .upload-section, #allSettingsContainer { padding: 1.5rem; }
+    .drag-drop-area { padding: 2rem 1rem; }
+
+    #appFooter { flex-direction: column; text-align: center; }
+    .footer-column { text-align: center; min-width: 100%; }
+    .footer-column ul { display: inline-block; text-align: left;}
+
+    #generatePackButton, .packInfoButton { width: 90%; font-size: 1.1rem; }
 }
 
-
-/* Ajustes Finais para Elementos do HoloPrint Original dentro da Nova Estrutura */
-#completedPacksCont, #log {
-    margin-top: 1.5rem;
-}
-body.dark-mode simple-logger {
-    --sl-log-default-color: var(--text-color-darker);
-    --sl-log-info-color: #63B3ED; /* Azul claro */
-    --sl-log-warn-color: #F6E05E; /* Amarelo */
-    --sl-log-error-color: #FC8181; /* Vermelho claro */
-    --sl-log-debug-color: #A0AEC0; /* Cinza */
-    background-color: rgba(31, 41, 55, 0.7); /* Fundo para o logger */
-    border-top: 1px solid var(--card-border-color);
-}
-simple-logger { /* Estilo base para o logger */
-    background-color: rgba(249, 250, 251, 0.7);
-    padding: 1rem;
-    border-radius: 0.5rem;
-    max-height: 200px;
-    overflow-y: auto;
+@media (max-width: 480px) {
+    .hero-section h1 { font-size: 1.5rem; }
+    .hero-section p { font-size: 1rem; }
+    .upload-section h2 { font-size: 1.25rem; }
+    #allSettingsContainer > summary h2 { font-size: 1.1rem;}
 }
 
-
-/* Ajustar os inputs de file dentro dos fieldsets alternativos */
-.alt-upload-options input[type="file"] {
-    display: none; /* Esconde o input default */
+/* Melhoria de acessibilidade para foco */
+:focus-visible {
+    outline: 2px solid var(--primary-accent-color);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(var(--primary-accent-color-rgb, 0,161,255), 0.2);
 }
-.alt-upload-options .buttonlike { /* Faz o label parecer um botão */
-    display: inline-block; /* Para que possa ter padding e ser clicável */
-    cursor: pointer;
+/* Remover outline padrão para quem navega com mouse mas manter para teclado */
+*:focus:not(:focus-visible) {
+    outline: none;
 }
