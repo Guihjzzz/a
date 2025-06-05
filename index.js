@@ -1,7 +1,7 @@
 import { extractStructureFilesFromMcworld } from "mcbe-leveldb-reader";
 import { selectEl, downloadBlob, sleep, selectEls, loadTranslationLanguage, translate, getStackTrace, random, UserError, joinOr, conditionallyGroup, groupByFileExtension, addFilesToFileInput, setFileInputFiles, dispatchInputEvents } from "./essential.js";
-import * as HoloPrint from "./HoloPrint.js";
-import SupabaseLogger from "./SupabaseLogger.js";
+import * as HoloPrint from "./HoloPrint.js"; // Seu HoloPrint.js modificado para "HoloLab"
+import SupabaseLogger from "./SupabaseLogger.js"; // Será removido se você não estiver usando Supabase
 
 import ResourcePackStack from "./ResourcePackStack.js";
 import LocalResourcePack from "./LocalResourcePack.js";
@@ -10,11 +10,14 @@ import ItemCriteriaInput from "./components/ItemCriteriaInput.js";
 import FileInputTable from "./components/FileInputTable.js";
 import SimpleLogger from "./components/SimpleLogger.js";
 
-const IN_PRODUCTION = false;
-const ACTUAL_CONSOLE_LOG = false; 
+const IN_PRODUCTION = false; // Defina como true para produção, para habilitar SupabaseLogger
+const ACTUAL_CONSOLE_LOG = false; // Defina como true para usar o console real do navegador
 
-const supabaseProjectUrl = "https://gnzyfffwvulwxbczqpgl.supabase.co";
-const supabaseApiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduenlmZmZ3dnVsd3hiY3pxcGdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMwMjE3NzgsImV4cCI6MjAzODU5Nzc3OH0.AWMhFcP3PiMD3dMC_SeIVuPx128KVpgfkZ5qBStDuVw";
+// Comentado ou removido se SupabaseLogger não for usado
+// const supabaseProjectUrl = "https://gnzyfffwvulwxbczqpgl.supabase.co";
+// const supabaseApiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduenlmZmZ3dnVsd3hiY3pxcGdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMwMjE3NzgsImV4cCI6MjAzODU5Nzc3OH0.AWMhFcP3PiMD3dMC_SeIVuPx128KVpgfkZ5qBStDuVw";
+let supabaseLogger; // Removido a inicialização aqui se não for usar
+
 
 window.OffscreenCanvas ??= class OffscreenCanvas {
 	constructor(w, h) {
@@ -49,39 +52,40 @@ let completedPacksCont;
 let logger;
 let languageSelector;
 let defaultResourcePackStackPromise;
-let supabaseLogger;
 let texturePreviewImageCont;
 let texturePreviewImage;
 let themeToggleButton;
 let primaryColorPicker;
 let secondaryColorPicker;
 let buttonHoverColorPicker;
-let clearResourcePackCacheButton; 
-let allSettingsContainerDetails; // Para o <details> principal
+let clearResourcePackCacheButton;
 
 let initialTranslationsApplied = false;
 let languageIsLoading = false;
 
-// Função para simular progresso (substitua pela sua lógica real se tiver uma)
-function simulateProgress(duration = 2000) {
-    const progressBarContainer = document.getElementById('customProgressBarContainer');
-    const progressBar = document.getElementById('customProgressBar');
-    if (!progressBarContainer || !progressBar) return;
+// Função para simular progresso (MANTIDA COMO EXEMPLO)
+function simulateProgress(duration = 2300) { // Ajustado para 2.3 segundos como na sua imagem de log
+    const progressBarContainer = document.getElementById('customProgressBarContainer'); // Você precisará de um elemento com este ID no HTML
+    const progressBar = document.getElementById('customProgressBar'); // E este para a barra interna
+    if (!progressBarContainer || !progressBar) {
+        console.warn("Progress bar elements not found.");
+        return;
+    }
 
     progressBarContainer.classList.remove('hidden');
     progressBar.style.width = '0%';
     progressBar.textContent = '0%';
-
     let progress = 0;
-    const intervalTime = duration / 100; // Atualiza a cada 1%
+    const intervalTime = duration / 100; 
     const interval = setInterval(() => {
         progress++;
-        progressBar.style.width = progress + '%';
-        progressBar.textContent = progress + '%';
+        if (progress <= 100) {
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = progress + '%';
+        }
         if (progress >= 100) {
             clearInterval(interval);
-            // Adia o esconder da barra para depois que o botão de download/erro aparecer
-            // setTimeout(() => progressBarContainer.classList.add('hidden'), 500);
+            // A barra será escondida em makePackAndHandleUI quando o botão de download/erro for mostrado
         }
     }, intervalTime);
 }
@@ -104,8 +108,6 @@ async function initializePage() {
     generatePackForm = selectEl("#generatePackForm");
     dropFileNotice = selectEl("#dropFileNotice");
     structureFilesInput = selectEl("#structureFilesInput");
-    allSettingsContainerDetails = selectEl("#allSettingsContainer"); // Seleciona o <details>
-
     let notStructureFileError = selectEl("#notStructureFileError");
     worldFileInput = selectEl("#worldFileInput");
     let worldExtractionMessage = selectEl("#worldExtractionMessage");
@@ -141,59 +143,73 @@ async function initializePage() {
                 structureFilesInput.setCustomValidity(notStructureFileError.textContent || translateCurrentLanguage("structure_files.error"));
             }
             addFilesToFileInput(structureFilesList, filesToAdd);
-            if (allSettingsContainerDetails && filesToAdd.length > 0) { // Abrir settings se arquivos forem carregados
-                allSettingsContainerDetails.open = true;
-            }
         });
     }
 
-    if (worldFileInput && worldExtractionMessage && worldExtractionSuccess && worldExtractionError && worldExtractionWorldError) {
+
+    if (worldFileInput) {
         worldFileInput.addEventListener("input", async () => {
-            worldExtractionMessage.classList.add("hidden");
-            worldExtractionSuccess.classList.add("hidden");
-            worldExtractionError.classList.add("hidden");
-            worldExtractionWorldError.classList.add("hidden");
+            if (worldExtractionMessage) worldExtractionMessage.classList.add("hidden");
+            if (worldExtractionSuccess) worldExtractionSuccess.classList.add("hidden");
+            if (worldExtractionError) worldExtractionError.classList.add("hidden");
+            if (worldExtractionWorldError) worldExtractionWorldError.classList.add("hidden");
             if (oldPackInput) oldPackInput.setCustomValidity("");
+            
             let worldFile = worldFileInput.files[0];
             if (!worldFile) return;
-
-            worldExtractionMessage.classList.remove("hidden");
-            worldExtractionMessage.scrollIntoView({ block: "center", behavior: "smooth" });
+            
+            const extractTabRadio = selectEl("#extractFromWorldTab");
+            if (extractTabRadio) extractTabRadio.checked = true;
+            
+            if (worldExtractionMessage) {
+                worldExtractionMessage.classList.remove("hidden");
+                worldExtractionMessage.scrollIntoView({ block: "center", behavior: "smooth" });
+            }
             let structureFiles;
             try {
                 structureFiles = await extractStructureFilesFromMcworld(worldFile);
             } catch (e) {
-                worldExtractionMessage.classList.add("hidden");
-                worldExtractionWorldError.dataset.translationSubError = e.message;
-                worldExtractionWorldError.classList.remove("hidden");
-                worldFileInput.setCustomValidity(worldExtractionWorldError.textContent);
+                if (worldExtractionMessage) worldExtractionMessage.classList.add("hidden");
+                if (worldExtractionWorldError) {
+                    worldExtractionWorldError.dataset.translationSubError = e.message;
+                    worldExtractionWorldError.classList.remove("hidden");
+                    if (worldFileInput) worldFileInput.setCustomValidity(worldExtractionWorldError.textContent);
+                }
                 if(languageSelector?.value) await translatePage(languageSelector.value);
                 return;
             }
-            worldExtractionMessage.classList.add("hidden");
+            if (worldExtractionMessage) worldExtractionMessage.classList.add("hidden");
             if (structureFiles && structureFiles.size) {
                 addFilesToFileInput(structureFilesList, Array.from(structureFiles.values()));
-                worldExtractionSuccess.dataset.translationSubCount = structureFiles.size.toString();
-                worldExtractionSuccess.classList.remove("hidden");
-                 if (allSettingsContainerDetails) allSettingsContainerDetails.open = true;
+                if(worldExtractionSuccess) {
+                    worldExtractionSuccess.dataset.translationSubCount = structureFiles.size.toString();
+                    worldExtractionSuccess.classList.remove("hidden");
+                }
             } else {
-                worldExtractionError.classList.remove("hidden");
-                worldFileInput.setCustomValidity(worldExtractionError.textContent);
+                if(worldExtractionError) worldExtractionError.classList.remove("hidden");
+                if(worldFileInput) worldFileInput.setCustomValidity(worldExtractionError?.textContent || 'Error');
             }
             if(languageSelector?.value) await translatePage(languageSelector.value);
         });
     }
 
-    if (oldPackInput && oldPackExtractionMessage && oldPackExtractionSuccess && oldPackExtractionError) {
+    if (oldPackInput) {
         oldPackInput.addEventListener("input", async () => {
-            oldPackExtractionMessage.classList.add("hidden");
-            oldPackExtractionSuccess.classList.add("hidden");
-            oldPackExtractionError.classList.add("hidden");
-            oldPackInput.setCustomValidity("");
+            if(oldPackExtractionMessage) oldPackExtractionMessage.classList.add("hidden");
+            if(oldPackExtractionSuccess) oldPackExtractionSuccess.classList.add("hidden");
+            if(oldPackExtractionError) oldPackExtractionError.classList.add("hidden");
+            if(oldPackInput) oldPackInput.setCustomValidity("");
+            
             let oldPack = oldPackInput.files[0];
             if (!oldPack) return;
-            oldPackExtractionMessage.classList.remove("hidden");
-            oldPackExtractionMessage.scrollIntoView({ block: "center", behavior: "smooth" });
+
+            const updateTabRadio = selectEl("#updatePackTab");
+            if(updateTabRadio) updateTabRadio.checked = true;
+            
+            if(oldPackExtractionMessage) {
+                oldPackExtractionMessage.classList.remove("hidden");
+                oldPackExtractionMessage.scrollIntoView({ block: "center", behavior: "smooth" });
+            }
             let extractedStructureFiles = [];
             try {
                 extractedStructureFiles = await HoloPrint.extractStructureFilesFromPack(oldPack);
@@ -202,28 +218,22 @@ async function initializePage() {
                 const errorKey = "update_pack.error";
                 let errorMessage = translateCurrentLanguage(errorKey) || "Error processing pack.";
                  if (e.message) errorMessage += ` (Details: ${e.message})`;
-                oldPackExtractionError.innerHTML = errorMessage; 
+                if(oldPackExtractionError) oldPackExtractionError.innerHTML = errorMessage; 
             }
-            oldPackExtractionMessage.classList.add("hidden");
+            if(oldPackExtractionMessage) oldPackExtractionMessage.classList.add("hidden");
             if (extractedStructureFiles.length) {
                 addFilesToFileInput(structureFilesList, extractedStructureFiles);
-                oldPackExtractionSuccess.classList.remove("hidden");
-                if (allSettingsContainerDetails) allSettingsContainerDetails.open = true;
+                if(oldPackExtractionSuccess) oldPackExtractionSuccess.classList.remove("hidden");
             } else {
-                oldPackExtractionError.classList.remove("hidden");
-                oldPackInput.setCustomValidity(oldPackExtractionError.textContent);
+                if(oldPackExtractionError) oldPackExtractionError.classList.remove("hidden");
+                if(oldPackInput) oldPackInput.setCustomValidity(oldPackExtractionError?.textContent || 'Error');
             }
              if(languageSelector?.value) await translatePage(languageSelector.value);
         });
     }
     
     if (structureFilesList) {
-        structureFilesList.addEventListener("input", ()=>{
-            updatePackNameInputPlaceholder();
-            if (structureFilesList.files.length > 0 && allSettingsContainerDetails) {
-                allSettingsContainerDetails.open = true; // Abrir settings se arquivos forem carregados
-            }
-        });
+        structureFilesList.addEventListener("input", updatePackNameInputPlaceholder);
         updatePackNameInputPlaceholder();
     }
 
@@ -258,9 +268,6 @@ async function initializePage() {
         if (dropFileNotice) dropFileNotice.classList.add("hidden");
         let files = [...e.dataTransfer.files];
         handleInputFiles(files);
-         if (allSettingsContainerDetails && files.length > 0) { // Abrir settings após drop
-            allSettingsContainerDetails.open = true;
-        }
     });
 
     if (!customElements.get("item-criteria-input")) {
@@ -294,7 +301,6 @@ async function initializePage() {
         let packIconInputElement = generatePackForm.elements.namedItem("packIcon");
         let packIconBlobValue = packIconInputElement?.files[0]?.size ? packIconInputElement.files[0] : undefined;
 
-
         /** @type {import("./HoloPrint.js").HoloPrintConfig} */
         let configObject = {
             IGNORED_BLOCKS: formData.get("ignoredBlocks")?.split(/\W/).removeFalsies() ?? [],
@@ -326,7 +332,7 @@ async function initializePage() {
         };
         
         let currentResourcePackStack = await new ResourcePackStack(resourcePacks);
-        simulateProgress(2200); // Inicia a barra de progresso
+        simulateProgress(); 
         makePackAndHandleUI(formData.getAll("structureFiles"), configObject, currentResourcePackStack);
     });
 
@@ -359,7 +365,7 @@ async function initializePage() {
             descriptionLinksCont.textContent = "";
             links.forEach(([label, link], i) => {
                 if (i) descriptionLinksCont.appendChild(document.createElement("br"));
-                const span = document.createElement('span'); // Criar span para o texto traduzido
+                const span = document.createElement('span'); 
                 span.dataset.translate = "metadata.description.link_found";
                 descriptionLinksCont.appendChild(span);
                 descriptionLinksCont.insertAdjacentText("beforeend", " " + link);
@@ -457,14 +463,15 @@ async function initializePage() {
             }
         } catch (error) {
             console.error("Error loading or processing languages:", error);
-            await translatePage("en_US");
+            await translatePage("en_US"); // Tenta traduzir para inglês se houver erro
             if (selectEl("#languageSelectorCont")) selectEl("#languageSelectorCont").style.display = 'none';
         }
-    } else {
+    } else { // Se não houver seletor, apenas carrega inglês
         await translatePage("en_US");
     }
-    initialTranslationsApplied = true; // Mover para cá
-    applySavedThemeAndColors(); // Aplicar tema APÓS a primeira tradução e carregamento de idiomas
+    initialTranslationsApplied = true;
+    applySavedThemeAndColors();
+
 
     themeToggleButton = selectEl("#themeToggleButton");
     primaryColorPicker = selectEl("#primaryColorPicker");
@@ -545,7 +552,7 @@ async function initializePage() {
 } 
 
 function applyTheme (theme) {
-    if (!document.body) return; // Checagem adicional
+    if (!document.body) return;
     if (document.body.classList.contains("dark-mode") && theme === "dark") return;
     if (!document.body.classList.contains("dark-mode") && theme === "light") return;
 
@@ -582,13 +589,12 @@ function applyButtonHoverColor (color) {
 };
 
 function applySavedThemeAndColors(){
-    const savedTheme = localStorage.getItem("theme");
-    // Obter os valores padrão das variáveis CSS caso não haja nada salvo
     const rootStyle = getComputedStyle(document.documentElement);
     const defaultPrimaryColor = rootStyle.getPropertyValue('--primary-accent-color').trim() || "#4A90E2";
     const defaultSecondaryColor = rootStyle.getPropertyValue('--secondary-accent-color').trim() || "#50E3C2";
     const defaultButtonHoverColor = rootStyle.getPropertyValue('--button-hover-background-color').trim() || "#D6EFFF";
 
+    const savedTheme = localStorage.getItem("theme");
     const primaryColorToApply = localStorage.getItem("primaryColor") || defaultPrimaryColor;
     const secondaryColorToApply = localStorage.getItem("secondaryColor") || defaultSecondaryColor;
     const buttonHoverColorToApply = localStorage.getItem("buttonHoverColor") || defaultButtonHoverColor;
@@ -609,7 +615,7 @@ function applySavedThemeAndColors(){
     });
 
     if (primaryColorPicker) { 
-        primaryColorPicker.value = primaryColorToApply;
+        primaryColorPicker.value = primaryColorToApply; 
         applyPrimaryColor(primaryColorToApply);     
     }
     if (secondaryColorPicker) {
@@ -623,14 +629,12 @@ function applySavedThemeAndColors(){
     updateThemeToggleButtonText(); 
 }
 
-
 document.addEventListener("DOMContentLoaded", initializePage);
 
 window.addEventListener("load", async () => {
 	if(location.search == "?generateEnglishTranslations") {
 		await translatePage("en_US", true);
 	}
-    // applySavedThemeAndColors é chamado no final de initializePage agora, após o carregamento dos idiomas.
 });
 
 async function handleInputFiles(files) {
@@ -721,9 +725,9 @@ async function translatePage(language, generateTranslations = false) {
     } catch (e) {
         console.error(`Failed to load language file for ${language}:`, e);
         languageIsLoading = false;
-        if (language !== "en_US" && !generateTranslations) {
-            console.warn("Attempting to load English as fallback.");
-            await translatePage("en_US", generateTranslations); 
+        if (language !== "en_US" && !generateTranslations) { 
+            console.warn("Attempting to load English as fallback for translatePage.");
+            await translatePage("en_US", generateTranslations);
         } else if (generateTranslations) {
             console.error("Cannot generate translations if base language file fails to load.");
         }
@@ -766,10 +770,6 @@ async function translatePage(language, generateTranslations = false) {
                         el.setAttribute(targetAttribute, substitutedTranslation);
                     }
 				} else {
-                    // Reduzido o log para apenas uma vez se initialTranslationsApplied for falso
-                    if (!initialTranslationsApplied) {
-                        // console.warn(`Key: "${translationKey}" in lang: ${language} missing.`);
-                    }
                     let fallbackText = translationKey; 
                     if (targetAttribute === 'innerhtml' && (el.innerHTML === "" || el.innerHTML === "..." || el.innerHTML === translationKey)) {
                         let englishTranslation = translate(translationKey, "en_US");
@@ -783,7 +783,7 @@ async function translatePage(language, generateTranslations = false) {
 				}
 			}
         }
-        if (!generateTranslations && el.innerHTML && el.innerHTML.includes('{')) { 
+        if (!generateTranslations && el.innerHTML && typeof el.innerHTML === 'string' && el.innerHTML.includes('{')) { 
              let currentHTML = el.innerHTML;
              let newHTML = performTranslationSubstitutions(el, currentHTML);
              if (currentHTML !== newHTML) {
@@ -797,7 +797,7 @@ async function translatePage(language, generateTranslations = false) {
 		downloadBlob(new File([JSON.stringify(translations, null, "\t")], `${language}.json`));
 	}
 
-    if (typeof updateThemeToggleButtonText === 'function') {
+    if (typeof updateThemeToggleButtonText === 'function') { // Atualiza o texto do botão de tema sempre que as traduções mudam
         updateThemeToggleButtonText();
     }
     if (!generateTranslations) initialTranslationsApplied = true;
@@ -813,26 +813,33 @@ function performTranslationSubstitutions(el, translation) {
             let camelCasePlaceholder = subName.charAt(0).toLowerCase() + subName.slice(1);
 
             const value = el.dataset[key];
-			translation = translation.replaceAll(`{${snakeCasePlaceholder}}`, value);
-			translation = translation.replaceAll(`{${camelCasePlaceholder}}`, value);
+            let valueToSubstitute = value;
 
-			if (/^\d+$/.test(value)) {
+            // Trata a pluralização primeiro, se o placeholder exigir
+            const pluralRegexSnake = new RegExp(`\\{(${snakeCasePlaceholder}|${camelCasePlaceholder})\\s*\\[\\s*([^|\\]]+?)\\s*\\|\\s*([^|\\]]+?)\\s*\\]\\}`, "g");
+            if (/^\d+$/.test(value)) {
                 const numValue = parseInt(value, 10);
-                const pluralRegexSnake = new RegExp(`\\{${snakeCasePlaceholder}\\s*\\[\\s*([^|\\]]+?)\\s*\\|\\s*([^|\\]]+?)\\s*\\]\\}`, "g");
-                translation = translation.replace(pluralRegexSnake, (match, singular, plural) => (numValue === 1 ? singular : plural));
-                
-                const pluralRegexCamel = new RegExp(`\\{${camelCasePlaceholder}\\s*\\[\\s*([^|\\]]+?)\\s*\\|\\s*([^|\\]]+?)\\s*\\]\\}`, "g");
-                 translation = translation.replace(pluralRegexCamel, (match, singular, plural) => (numValue === 1 ? singular : plural));
-                
-                 if (numValue === 1) {
-                    translation = translation.replace(/\[s\]/g, "").replace(/\[es\]/g, "");
-                } else {
-                    translation = translation.replace(/\[s\]/g, "s").replace(/\[es\]/g, "es");
-                }
-                translation = translation.replace(/\[[^\]]+\]/g, ""); 
-			}
+                translation = translation.replace(pluralRegexSnake, (match, pKey, singular, plural) => {
+                    return numValue === 1 ? singular : plural;
+                });
+                // Se não houver match, valueToSubstitute continua sendo o número original para a substituição abaixo
+            }
+            
+			translation = translation.replaceAll(`{${snakeCasePlaceholder}}`, valueToSubstitute);
+			translation = translation.replaceAll(`{${camelCasePlaceholder}}`, valueToSubstitute);
 		}
 	});
+    // Limpeza final de [s] ou [es] que podem ter sobrado se não foram tratados pela pluralização específica
+    const tempValueForSimplePlural = el.dataset.translationSubCount; // Usa a contagem específica se disponível
+    if (tempValueForSimplePlural && /^\d+$/.test(tempValueForSimplePlural)) {
+        const numVal = parseInt(tempValueForSimplePlural, 10);
+        if (numVal === 1) {
+            translation = translation.replace(/\[s\]/g, "").replace(/\[es\]/g, "");
+        } else {
+            translation = translation.replace(/\[s\]/g, "s").replace(/\[es\]/g, "es");
+        }
+    }
+    translation = translation.replace(/\[[^\]]+\]/g, ""); // Remove qualquer [texto] restante
 	return translation;
 }
 
@@ -846,6 +853,9 @@ function translateCurrentLanguage(translationKey, fallbackString = null) {
 	if(translation === undefined) {
 		translation = translate(translationKey, "en_US");
 		if(translation === undefined) {
+            if (!initialTranslationsApplied && translationKey !== fallbackString) {
+                // console.warn(`Key "${translationKey}" not found in ${currentLang} or en_US. Init fallback: "${fallbackString ?? translationKey}"`);
+            }
 			translation = fallbackString ?? translationKey;
 		}
 	}
@@ -858,14 +868,14 @@ async function temporarilyChangeText(el, translationKey, duration = 2000) {
     let originalDatasetTranslate = el.dataset.translate;
 
 	el.dataset.translate = translationKey;
-    if (languageSelector?.value) await translatePage(languageSelector.value); 
+    if (languageSelector?.value && initialTranslationsApplied) await translatePage(languageSelector.value); 
 	
     el.setAttribute("disabled", "");
 	await sleep(duration);
 
     if (originalDatasetTranslate) {
 	    el.dataset.translate = originalDatasetTranslate;
-        if (languageSelector?.value) await translatePage(languageSelector.value);
+        if (languageSelector?.value && initialTranslationsApplied) await translatePage(languageSelector.value);
     } else {
         el.removeAttribute("data-translate");
         el.textContent = originalTextContent;
@@ -896,40 +906,38 @@ async function makePackAndHandleUI(structureFiles, configObject, resourcePackSta
     if (!generatePackFormSubmitButton || !completedPacksCont) return;
     generatePackFormSubmitButton.disabled = true;
 
-    if (IN_PRODUCTION && supabaseLogger) {
+    const progressBarContainer = document.getElementById('customProgressBarContainer');
+    if (progressBarContainer) progressBarContainer.classList.remove('hidden');
+
+
+    if (IN_PRODUCTION && typeof SupabaseLogger !== 'undefined') { // Verifica se SupabaseLogger está definido
+        supabaseLogger ??= new SupabaseLogger(supabaseProjectUrl, supabaseApiKey);
         console.debug("User agent:", navigator.userAgent);
     }
 
-    // Limpar resultados anteriores
     while (completedPacksCont.firstChild) {
         completedPacksCont.removeChild(completedPacksCont.firstChild);
     }
-    const progressBarContainer = document.getElementById('customProgressBarContainer'); // Seu ID
-    const progressBar = document.getElementById('customProgressBar');
-    if (progressBarContainer) progressBarContainer.classList.add('hidden'); // Esconde a barra
-
 
     let previewCont = document.createElement("div");
     previewCont.classList.add("previewCont");
-    // Não adiciona previewCont ainda, HoloPrint.makePack decide.
+    // O previewCont será adicionado ao DOM pelo HoloPrint.makePack se necessário
 
     let infoButton = document.createElement("button");
     infoButton.classList.add("packInfoButton");
     infoButton.dataset.translate = "progress.generating";
-    completedPacksCont.appendChild(infoButton); // Adiciona o botão de progresso
+    completedPacksCont.appendChild(infoButton); 
     
-    if (languageSelector?.value && initialTranslationsApplied) { // Garante que as traduções possam ser aplicadas
+    if (languageSelector?.value && initialTranslationsApplied) {
          await translatePage(languageSelector.value);
     }
-    if (progressBarContainer) progressBarContainer.classList.remove('hidden'); // Mostra barra
-
 
     if (logger) logger.setOriginTime(performance.now());
 
     let pack;
     let generationFailedError;
     try {
-        pack = await HoloPrint.makePack(structureFiles, configObject, resourcePackStackInstance, previewCont); // previewCont é passado
+        pack = await HoloPrint.makePack(structureFiles, configObject, resourcePackStackInstance, previewCont);
     } catch (e) {
         console.error(`Pack creation failed!`, e); 
         if (!(e instanceof UserError)) {
@@ -937,21 +945,16 @@ async function makePackAndHandleUI(structureFiles, configObject, resourcePackSta
         }
     }
     
-    if (progressBarContainer) progressBarContainer.classList.add('hidden'); // Esconde a barra após a geração
+    if (progressBarContainer) progressBarContainer.classList.add('hidden');
 
-    infoButton.classList.add("finished"); 
+    infoButton.classList.add("finished");
+    if (completedPacksCont.contains(previewCont) && previewCont.childNodes.length === 0) {
+        // Se o preview foi adicionado mas está vazio (sem preview mostrado), remove-o.
+        completedPacksCont.removeChild(previewCont);
+    }
+
 
     if (pack) {
-        // Se HoloPrint.makePack adicionou conteúdo ao previewCont, ele já estará no DOM via completedPacksCont.
-        // Se não, e previewCont está vazio, podemos removê-lo (opcional)
-        if (previewCont.childNodes.length === 0 && previewCont.parentNode === completedPacksCont) {
-            completedPacksCont.removeChild(previewCont);
-        } else if (previewCont.childNodes.length > 0 && previewCont.parentNode !== completedPacksCont) {
-            // Se makePack populou mas não adicionou, adicionamos aqui
-            completedPacksCont.appendChild(previewCont);
-        }
-
-
         infoButton.dataset.translate = "download";
         if (languageSelector?.value) await translatePage(languageSelector.value);
         infoButton.classList.add("completed");
@@ -964,30 +967,26 @@ async function makePackAndHandleUI(structureFiles, configObject, resourcePackSta
             downloadBlob(pack, pack.name);
         };
     } else {
-        if (previewCont.parentNode === completedPacksCont) { // Remove o contêiner de preview se a geração falhar
-             completedPacksCont.removeChild(previewCont);
-        }
-
         infoButton.classList.remove("completed"); 
         if (generationFailedError) {
             let bugReportAnchor = document.createElement("a");
             bugReportAnchor.classList.add("buttonlike", "packInfoButton", "reportIssue", "finished");
             const logsForReport = selectEl("simple-logger")?.allLogs ?? [];
-            bugReportAnchor.href = `https://github.com/Guihjzzz/HoloLab/issues/new?template=1-pack-creation-error.yml&title=Pack creation error: ${encodeURIComponent(generationFailedError.toString().replaceAll("\n", " "))}&version=${HoloPrint.VERSION}&logs=${encodeURIComponent(JSON.stringify(logsForReport))}`; // URL do SEU REPOSITÓRIO
+            bugReportAnchor.href = `https://github.com/Guihjzzz/HoloLab/issues/new?template=1-pack-creation-error.yml&title=Pack creation error: ${encodeURIComponent(generationFailedError.toString().replaceAll("\n", " "))}&version=${HoloPrint.VERSION}&logs=${encodeURIComponent(JSON.stringify(logsForReport))}`;
             bugReportAnchor.target = "_blank";
             bugReportAnchor.dataset.translate = "pack_generation_failed.report_github_issue";
             
             if (infoButton.parentNode) {
                 infoButton.parentNode.replaceChild(bugReportAnchor, infoButton);
             } else {
-                 completedPacksCont.appendChild(bugReportAnchor); // Append em vez de prepend
+                 completedPacksCont.appendChild(bugReportAnchor);
                  if(infoButton) infoButton.remove(); 
             }
             if (languageSelector?.value) await translatePage(languageSelector.value);
         } else {
             infoButton.classList.add("failed");
             infoButton.dataset.translate = "pack_generation_failed";
-             if (languageSelector?.value) await translatePage(languageSelector.value);
+            if (languageSelector?.value) await translatePage(languageSelector.value);
         }
     }
     generatePackFormSubmitButton.disabled = false;
