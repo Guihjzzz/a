@@ -1,372 +1,412 @@
-/* This can only be described as functional. */
+/* HoloLab - index.css */
 :root {
 	--icon-scale: 1;
 	--success-green: #3AB336;
 	--error-red: #E24436;
 
-    /* --- NOVO: Variáveis de Cor para Tema --- */
-    /* DEFAULT LIGHT THEME COLORS (Baseado em tons azulados) */
-    --primary-accent-color: #4A90E2;    /* Azul primário */
-    --secondary-accent-color: #50E3C2;  /* Verde-azulado secundário / Ciano */
-    --button-background-color: #F0F8FF; /* Quase branco, um azul bem claro */
-    --button-hover-background-color: #D6EFFF; /* Azul mais claro para hover */
-    --button-active-background-color: #BCE0FF; /* Azul um pouco mais escuro para active */
-    --button-disabled-background-color: #D3D3D3; /* Cinza claro para desabilitado */
-    --button-disabled-border-color: #B0B0B0; /* Cinza para borda desabilitada */
-    --input-hover-background-color: #E6F3FF; /* Azul muito claro para hover de input */
-    --text-color: #28313B; /* Texto escuro, levemente azulado */
-    --background-color: #F8F9FA; /* Fundo do body quase branco */
-    --main-background-color: rgba(255, 255, 255, 0.85); /* Fundo da caixa principal, branco com transparência */
-    --main-border-color: var(--secondary-accent-color); /* Borda com cor secundária */
-    --fieldset-border-color: #C0CCDA; /* Cinza azulado para bordas de fieldsets */
-	--body-bg-image-overlay: linear-gradient(var(--background-color), var(--background-color)); /* Overlay para a imagem de fundo do body */
-    --drag-drop-notice-bg: rgba(0, 0, 0, 0.05); /* Fundo sutil para arrastar e soltar */
-    --checkbox-off-after-bg: #A8B0B8; /* Cinza para círculo interno do checkbox desligado */
-    --checkbox-on-bg: var(--primary-accent-color); /* Cor de fundo do checkbox ligado (azul primário) */
-    --link-color: #007BFF; /* Azul padrão para links */
-    --link-visited-color: #551A8B; /* Roxo padrão para links visitados (comum) */
-    --placeholder-color: #6C757D; /* Cinza escuro para placeholder */
-    --description-links-color: #495057; /* Cinza um pouco mais escuro para links de descrição */
-    --loader-color: var(--primary-accent-color); /* Cor do loader (azul primário) */
-    --buttonlike-tab-active-bg: var(--button-hover-background-color);
-    --packinfobutton-text-color: #FFFFFF; /* Texto branco para bom contraste com gradiente azul */
-    --packinfobutton-border-color: var(--primary-accent-color);
-    --packinfobutton-bg-col1: var(--secondary-accent-color); /* Ciano */
-    --packinfobutton-bg-col2: var(--primary-accent-color);   /* Azul primário */
-    --packinfobutton-failed-bg-col1: #ee5350;
-    --packinfobutton-failed-bg-col2: #e43b37;
-
-}
-
-/* --- NOVO: DARK THEME --- */
-body.dark-mode {
-    --primary-accent-color: #58A6FF;    /* Azul claro e vibrante para destaque no escuro */
-    --secondary-accent-color: #30C9AA;  /* Ciano um pouco mais escuro/menos vibrante */
-    --button-background-color: #2D3748; /* Fundo dos botões bem escuro (cinza-azulado) */
-    --button-hover-background-color: #4A5568; /* Hover um pouco mais claro */
-    --button-active-background-color: #404B5A; /* Ativo */
-    --button-disabled-background-color: #2A2E37; /* Fundo de botões desabilitados */
-    --button-disabled-border-color: #404752;   /* Borda de botões desabilitados */
-    --input-hover-background-color: #3A4454;   /* Fundo de inputs (text, number) ao passar o mouse */
-    --text-color: #E2E8F0;             /* Texto quase branco */
-    --background-color: #1A202C;       /* Fundo muito escuro (quase preto azulado) */
-    --main-background-color: rgba(26, 32, 44, 0.85); /* Fundo do main escuro com transparência */
-    --main-border-color: var(--secondary-accent-color);
-    --fieldset-border-color: #4A5568;   /* Bordas dos fieldsets mais escuras */
-	--body-bg-image-overlay: linear-gradient(rgba(26, 32, 44, 0.92), rgba(26, 32, 44, 0.92)); /* Overlay escuro para a imagem de fundo */
-    --drag-drop-notice-bg: rgba(200, 200, 200, 0.08); 
-    --checkbox-off-after-bg: #4A5568; /* Cinza escuro para círculo interno */
-    --checkbox-on-bg: var(--primary-accent-color); /* Azul claro para fundo do checkbox ligado */
-    --link-color: #63B3ED;             /* Azul claro para links no modo escuro */
-    --link-visited-color: #9F7AEA;     /* Roxo claro para links visitados */
-    --placeholder-color: #718096;
-    --description-links-color: #A0AEC0;
+    /* --- Variáveis de Cor para Tema --- */
+    /* DEFAULT LIGHT THEME COLORS (Azulados) */
+    --primary-accent-color: #3B82F6;    /* Azul principal do design HoloLab */
+    --secondary-accent-color: #10B981;  /* Verde/Ciano para detalhes */
+    --button-background-color: #EFF6FF; /* Azul muito claro para botões/inputs */
+    --button-hover-background-color: #DBEAFE; 
+    --button-active-background-color: #BFDBFE;
+    --button-disabled-background-color: #E5E7EB;
+    --button-disabled-border-color: #D1D5DB;
+    --input-hover-background-color: #EBF4FF;
+    --text-color: #F9FAFB;             /* Texto claro (para fundo escuro do HoloLab) */
+    --text-color-darker: #9CA3AF;     /* Texto mais escuro/sutil (para parágrafos) */
+    --background-color: #111827;       /* Fundo do body bem escuro (HoloLab design) */
+    --card-background-color: #1F2937;   /* Fundo dos cards/seções */
+    --card-border-color: #374151;      /* Borda dos cards */
+	--body-bg-image-overlay: linear-gradient(rgba(17, 24, 39, 0.95), rgba(17, 24, 39, 0.95)); /* Overlay escuro */
+    --drag-drop-notice-bg: rgba(31, 41, 55, 0.8);
+    --checkbox-off-after-bg: #6B7280;
+    --checkbox-on-bg: var(--primary-accent-color);
+    --link-color: var(--secondary-accent-color); /* Ciano para links */
+    --link-visited-color: #059669; /* Ciano mais escuro para visitado */
+    --placeholder-color: #6B7280;
+    --description-links-color: var(--text-color-darker);
     --loader-color: var(--primary-accent-color);
     --buttonlike-tab-active-bg: var(--button-hover-background-color);
-    --packinfobutton-text-color: #FFFFFF; /* Texto branco ainda funciona bem */
-    /* Cores do PackInfoButton mantêm o gradiente original, mas a cor da borda usa a primária do tema */
+    --packinfobutton-text-color: #FFFFFF;
     --packinfobutton-border-color: var(--primary-accent-color);
-    --packinfobutton-bg-col1: var(--secondary-accent-color); 
+    --packinfobutton-bg-col1: var(--secondary-accent-color);
     --packinfobutton-bg-col2: var(--primary-accent-color);
+    --packinfobutton-failed-bg-col1: #EF4444; /* Vermelho mais vibrante para erro */
+    --packinfobutton-failed-bg-col2: #DC2626;
+
+    /* Cores específicas para modo claro (se o tema claro for reintroduzido) */
+    --light-text-color: #1F2937;
+    --light-background-color: #F9FAFB;
+    --light-card-background-color: #FFFFFF;
+    --light-card-border-color: #E5E7EB;
+    --light-body-bg-image-overlay: linear-gradient(#F9FAFB, #F9FAFB);
+
 }
-/* --- FIM DAS NOVAS VARIÁVEIS --- */
+
+/* --- DARK THEME (É O PADRÃO AGORA, MAS PODE SER USADO PARA ALTERNAR) --- */
+body.dark-mode { /* O :root já define um tema escuro, esta seção pode ser para variações futuras ou para forçar */
+    /* As variáveis do :root já são escuras. Se você quiser um tema claro alternativo, definirá aqui. */
+    /* Por exemplo, para um tema claro como alternativa: */
+    /*
+    --primary-accent-color: #4A90E2;
+    --secondary-accent-color: #50E3C2;
+    --text-color: var(--light-text-color);
+    --background-color: var(--light-background-color);
+    --card-background-color: var(--light-card-background-color);
+    --card-border-color: var(--light-card-border-color);
+    --body-bg-image-overlay: var(--light-body-bg-image-overlay);
+    --link-color: #007BFF;
+    --link-visited-color: #551A8B;
+    --button-background-color: #F0F8FF;
+    --button-hover-background-color: #DBEAFE;
+    */
+}
+
+/* --- ESTILOS GERAIS --- */
+html {
+    scroll-behavior: smooth;
+    font-size: 16px; /* Base para REMs */
+}
 
 body {
-	background-image: var(--body-bg-image-overlay), url("assets/logo_background.png");
-	background-size: 100px;
-	/* animation: move-background 10s linear infinite; */
+	background-image: var(--body-bg-image-overlay), url("assets/logo_background.png"); /* Mantenha sua imagem de fundo */
+	background-size: 100px; /* Ou ajuste conforme necessário */
+    background-color: var(--background-color);
 	font-family: "Catamaran", "Trebuchet MS", sans-serif;
 	color: var(--text-color);
-	line-height: 1.2;
-    background-color: var(--background-color);
+	line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     transition: background-color 0.3s, color 0.3s;
 }
-@keyframes move-background {
-	from { background-position: 0 0; }
-	to { background-position: 100px 60px; }
-}
-main {
-	margin: auto; padding: 20px; position: absolute; left: 0; right: 0; top: 0; bottom: 0;
-	width: 90vw; height: 90vh;
-	background: var(--main-background-color);
-	border: 5px solid var(--main-border-color);
-	border-radius: 25px; box-sizing: border-box; text-align: center;
-	overflow: auto; scroll-behavior: smooth;
-    transition: background-color 0.3s, border-color 0.3s;
-}
-h1 { margin: 6px 0; color: var(--text-color); }
-#responsiveWidthWrapper { margin: auto; width: 60%; }
-form { text-align: left; }
 
-/* Media Queries (mantidos do original) */
-@media (min-width: 1301px) { :root { font-size: 1.125em; --icon-scale: 1.6; } }
-@media (max-width: 1300px) { :root { --icon-scale: 1.3; } #responsiveWidthWrapper { width: 70%; } }
-@media (max-width: 1048px) { #responsiveWidthWrapper { width: 82.5%; } }
-@media (max-width: 748px) { :root { font-size: 0.875em; } #responsiveWidthWrapper { width: 95%; } }
-@media (max-width: 450px) { :root { font-size: 0.8em; --icon-scale: 1; } main { padding: 2px; } fieldset { padding: 5px; } }
-
-input[type="file"]:invalid { color: var(--error-red); outline: 3px solid var(--error-red); contain: paint; }
-#structureFileInputCont input[type="file"] ~ div {
-	margin: 4px auto; padding: 10px; box-sizing: border-box; width: 70%; font-weight: 500;
-	text-align: center; border: 3px dashed var(--primary-accent-color); border-radius: 25px; color: var(--text-color);
+/* --- CABEÇALHO --- */
+#appHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--card-background-color); /* Um pouco diferente do fundo principal */
+    border-bottom: 1px solid var(--card-border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
-#structureFileInputCont fieldset:first-of-type input[type="file"] ~ div { border: 3px solid var(--primary-accent-color); }
-#structureFileInputCont input[type="file"] ~ div p { margin: 0; }
-#structureFileInputCont input[type="file"] ~ div p:first-child { font-size: 1.4em; }
-#structureFileInputCont input[type="file"] ~ div p:last-child { font-size: 0.7em; }
-#structureFileInputCont:not(:has(+ file-input-table[has-files])):not(:has(fieldset label ~ span:not(.hidden))) { input[type="file"], ~ * { display: none; } }
-main:not(:has(file-input-table[has-files])):not(:has(.previewCont)) {
-	#structureFileInputCont:not(:has(fieldset label ~ span:not(.hidden))) input[type="file"] { display: none; }
-	form ~ *, #structureFileInputCont ~ * { display: none; }
+.logo-container {
+    display: flex;
+    align-items: center;
 }
-#structureFileInputCont:has(+ file-input-table[has-files]), #structureFileInputCont:has(fieldset label ~ span:not(.hidden)) { input[type="file"] ~ div { display: none; } }
-#structureFileInputCont fieldset label ~ span {
-	display: block; margin-top: 10px; font-weight: 500;
-	&[id$="success"i] { color: var(--success-green); }
-	&[id$="error"i] { color: var(--error-red); }
+#headerLogo {
+    height: 40px; /* Ajuste conforme o tamanho do seu logo */
+    width: auto;
+    margin-right: 0.75rem;
+    border: none; /* Remover borda padrão de img */
+    background: none; /* Remover fundo padrão de img */
 }
-#descriptionLinksCont { font-weight: 500; color: var(--description-links-color); font-size: 0.9em; }
-file-input-table { margin: 3px; }
-body.dark-mode file-input-table { color: var(--text-color); }
-
-fieldset { border: 1px solid var(--fieldset-border-color); color: var(--text-color); margin-bottom: 10px; }
-fieldset legend { color: var(--text-color); } /* Assegura cor da legenda */
-
-fieldset.expandable { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s; }
-fieldset.expandable:has(legend input:checked) { grid-template-rows: 1fr; }
-fieldset.expandable > *:not(legend) { overflow: hidden; }
-fieldset.expandable > legend { contain: layout; }
-fieldset.expandable > legend > label { padding-left: 1em; cursor: pointer; }
-fieldset.expandable > legend > label > input { display: none; }
-fieldset.expandable > legend::before {
-	content: ""; margin: auto; display: inline-block; position: absolute;
-	left: 3px; top: 3px; bottom: 0; width: 0.5em; height: 0.5em;
-	border-right: 1px solid var(--text-color); border-top: 1px solid var(--text-color);
-	transform: rotate(45deg); transform-origin: 75% 25%; transition: transform 0.35s, border-color 0.3s;
-}
-fieldset.expandable:has(legend input:checked) > legend::before { transform: rotate(135deg); }
-label { display: block; color: var(--text-color); margin-bottom: 0.3em; }
-
-input, select {
-	font-family: monospace;
-    background-color: var(--button-background-color);
+.header-title {
+    font-size: 1.5rem;
+    font-weight: 700;
     color: var(--text-color);
-    border: 1px solid var(--fieldset-border-color);
-    border-radius: 4px;
-    padding: 0.3em 0.5em;
 }
-select {
-    appearance: none; -webkit-appearance: none; -moz-appearance: none;
-    padding-right: 30px; 
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2328313B%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.9z%22%2F%3E%3C%2Fsvg%3E');
-    background-repeat: no-repeat; background-position: right 10px center; background-size: .65em auto;
+.header-nav a {
+    color: var(--text-color-darker);
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 500;
+    transition: color 0.2s ease-in-out;
 }
-body.dark-mode select {
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23E2E8F0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.9z%22%2F%3E%3C%2Fsvg%3E');
+.header-nav a:hover {
+    color: var(--primary-accent-color);
 }
-
-details { padding: 3px; width: fit-content; border: 1px solid var(--fieldset-border-color); border-radius: 5px; font-size: 0.825em; margin-top: 0.5em; }
-summary { padding: 0.2em 0.5em; font-weight: 500; font-size: 1rem; color: var(--text-color); cursor: pointer; border-radius: 3px; }
-body.dark-mode details[open] > summary,
-body:not(.dark-mode) details[open] > summary {
-    background-color: var(--button-hover-background-color);
+#languageSelectorCont { /* Ajustado para caber no header */
+    position: relative; /* Mudar de absolute */
+    top: auto; right: auto; /* Remover posicionamento absoluto */
 }
-
-button, input[type="checkbox"], input[type="number"], input[type="text"], textarea, input[type="file"]::file-selector-button, select, .buttonlike {
-	padding: 0.3em 0.6em; border: 2px solid var(--primary-accent-color); 
-	accent-color: var(--primary-accent-color); border-radius: 7px;
-	background: var(--button-background-color); font-family: inherit; color: var(--text-color);
-	cursor: pointer; transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
-}
-input[type="color"] {
-	border: 2px solid var(--primary-accent-color); border-radius: 7px; background: var(--button-background-color);
-	cursor: pointer; transition: background 0.15s; min-width: 35px; min-height: 25px; padding: 2px;
-}
-input[type="number"], input[type="text"], textarea { cursor: text; outline-width: thin; line-height: inherit; }
-input[type="text"]::placeholder { text-overflow: ellipsis; color: var(--placeholder-color); }
-body.dark-mode input[type="text"]::placeholder { color: var(--placeholder-color); }
-input[type="text"]:invalid { border-color: var(--error-red); outline-color: var(--error-red); }
-
-a, a.buttonlike { color: var(--link-color); text-decoration: initial; }
-a:visited, a.buttonlike:visited { color: var(--link-visited-color); }
-a:hover, a.buttonlike:hover { text-decoration: underline; }
-
-button:not(:disabled):not(.packInfoButton):hover, 
-input[type="file"]:not(:disabled):hover::file-selector-button, 
-select:not(:disabled):hover, 
-.buttonlike:not(.packInfoButton):hover {
-	background: var(--button-hover-background-color);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-body.dark-mode button:not(:disabled):not(.packInfoButton):hover, 
-body.dark-mode input[type="file"]:not(:disabled):hover::file-selector-button, 
-body.dark-mode select:not(:disabled):hover, 
-body.dark-mode .buttonlike:not(.packInfoButton):hover {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-button:disabled, input[type="file"]:disabled::file-selector-button, select:disabled, .buttonlike:disabled {
-	cursor: not-allowed; opacity: 0.7;
-}
-button:not(#generatePackButton):disabled {
-	background: var(--button-disabled-background-color); border-color: var(--button-disabled-border-color); color: #888;
-}
-body.dark-mode button:not(#generatePackButton):disabled { color: #777; }
-
-input[type="number"]:hover, input[type="text"]:hover, input[type="color"]:hover, textarea:hover {
-	background: var(--input-hover-background-color); border-color: var(--secondary-accent-color);
-}
-button:not(.packInfoButton):not(:disabled):active, 
-input[type="file"]:not(:disabled):active::file-selector-button, 
-select:not(:disabled):active, 
-.buttonlike:not(.packInfoButton):not(:disabled):active:active {
-	background: var(--button-active-background-color); box-shadow: inset 0 1px 3px rgba(0,0,0,0.15);
-}
-body.dark-mode button:not(.packInfoButton):not(:disabled):active, 
-body.dark-mode input[type="file"]:not(:disabled):active::file-selector-button, 
-body.dark-mode select:not(:disabled):active, 
-body.dark-mode .buttonlike:not(.packInfoButton):not(:disabled):active:active {
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
-}
-
-input[type="checkbox"] {
-	display: inline-block; appearance: none; width: 40px; height: 20px; border-radius: 10px;
-    background: var(--button-background-color); border: 2px solid var(--primary-accent-color);
-}
-input[type="checkbox"]:checked { background: var(--checkbox-on-bg); border-color: var(--primary-accent-color); }
-input[type="checkbox"]::after {
-	display: inline-block; width: 12px; height: 12px; position: relative; bottom: -1px; left: -2px;
-	background: var(--checkbox-off-after-bg); border-radius: 50%; content: "close";
-	font-family: "Material Symbols"; font-size: 15px; font-weight: bold; color: transparent;
-	text-shadow: 17px -3px 0 var(--text-color);
-	transition: left 0.2s, text-shadow 0.2s, background 0.15s, color 0.15s;
-}
-input[type="checkbox"]:checked::after {
-	left: 18px; content: "check"; text-shadow: -20px -3px 0 var(--text-color); /* Ícone com cor de texto padrão */
-    background: var(--primary-accent-color);
-}
-body.dark-mode input[type="checkbox"]:checked::after { 
-    text-shadow: -20px -3px 0 var(--button-background-color); /* Cor do texto do ícone no modo escuro, para contrastar com o --primary-accent-color */
-}
-input[type="checkbox"]:hover::after { background: var(--button-hover-background-color); }
-.resetButton { position: absolute; right: 10px; top: 0; }
-
-/* Estilo para abas (do seu original) */
-.multiTabCont > input[type="radio"][name^="configTabs"] { position: absolute; display: none; }
-.multiTabCont > label {
-	flex: 1 1 0; text-align: center; margin: 10px 5px 5px;
-    color: var(--text-color); background-color: var(--button-background-color);
-    border: 1px solid var(--primary-accent-color); border-bottom: none;
-    border-radius: 5px 5px 0 0; padding: 0.5em 0.2em;
-}
-.multiTabCont:nth-child(2) > label { margin: 0 5px 5px; } 
-.multiTabCont > fieldset { width: 100%; order: 1; contain: layout; }
-.multiTabCont > input[type="radio"][name^="configTabs"]:checked + label {
-	background: var(--buttonlike-tab-active-bg); font-weight: 500;
-    color: var(--text-color); border-bottom-color: var(--buttonlike-tab-active-bg);
-}
-.multiTabCont > input[type="radio"][name^="configTabs"]:not(:checked) + label + fieldset { display: none; }
-
-#dropFileNotice {
-	padding: 10px; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-	box-sizing: border-box; background: var(--drag-drop-notice-bg); font-size: 1.75em;
-	text-align: center; display: flex; justify-content: center; align-items: center;
-    color: var(--text-color); 
-}
-#generatePackButton, .packInfoButton {
-	margin: 4px auto; padding: 10px; box-sizing: border-box; width: 70%; display: block;
-	border-width: 3px; border-radius: 25px; text-align: center; font-size: 1.4em; font-weight: 500;
-    color: var(--packinfobutton-text-color); 
-}
-.packInfoButton {
-	--bg-col-1: var(--packinfobutton-bg-col1);
-	--bg-col-2: var(--packinfobutton-bg-col2);
-	background-image: repeating-linear-gradient(150deg, var(--bg-col-1) 0, var(--bg-col-1) 10px, var(--bg-col-2) 10px, var(--bg-col-2) 20px);
-	background-size: 200% !important; border-color: var(--packinfobutton-border-color);
-	transition: transform 0.15s, background-position 0.2s ease-out; min-width: min-content;
-}
-.packInfoButton:not(.finished) { cursor: wait; }
-.packInfoButton.completed { animation: moveButtonBackground 1s linear infinite; }
-@keyframes moveButtonBackground { from { background-position: -40px 0; } }
-.packInfoButton.completed:hover { transform: scale(1.05); }
-.packInfoButton.reportIssue:hover { transform: scale(1.035); }
-.packInfoButton.completed:active { transform: scale(1.02); }
-.packInfoButton.reportIssue:active { transform: scale(1.01); }
-.packInfoButton.failed, .packInfoButton.reportIssue {
-	--bg-col-1: var(--packinfobutton-failed-bg-col1);
-	--bg-col-2: var(--packinfobutton-failed-bg-col2);
-    color: #fff;
-}
-.packInfoButton.failed { cursor: initial; }
-.packInfoButton.reportIssue { cursor: pointer; }
-
-#termsOfUseNotice { display: block; text-align: center; color: var(--text-color); margin-top: 1em; }
-img:not(#languageSelectorButton), canvas {
-	display: inline-block; width: 400px; border: 1px solid var(--text-color);
-	background: url("assets/noise.svg");
-}
-body.dark-mode img:not(#languageSelectorButton), body.dark-mode canvas {
-    border-color: var(--fieldset-border-color);
-}
-
-.previewCont { padding: 5px; text-align: center; }
-.previewCont > * { width: min(80vmin, 100%); aspect-ratio: 1; }
-.previewCont canvas { touch-action: none; }
-.previewMessage {
-	margin: auto; display: flex; align-items: center; justify-content: center;
-	font-size: 2.5vw; border: 1px solid var(--text-color); 
-    background-color: var(--main-background-color); color: var(--text-color); 
-}
-@media (max-width: 768px) { .previewMessage { font-size: 3.5vw; } }
-@media (max-width: 450px) { .previewMessage { font-size: 5vw; } }
-.previewMessage.clickToView { cursor: pointer; }
-
-#languageSelectorCont { position: absolute; top: 10px; right: 10px; }
 #languageSelectorButton {
-	width: calc(22px * var(--icon-scale)); height: calc(22px * var(--icon-scale));
-	background: var(--text-color); 
-	mask: url("assets/translate_icon.svg") no-repeat center;
-	-webkit-mask: url("assets/translate_icon.svg") no-repeat center; 
-	transition: transform 0.15s, background-color 0.3s;
+    background: var(--text-color-darker); /* Ícone um pouco mais sutil */
 }
-#languageSelectorCont:hover > #languageSelectorButton { transform: scale(1.125); }
-#languageSelector { opacity: 0; position: absolute; left: 0; top: 0; width: 100%; height: 100%; cursor: pointer; }
-.hidden { display: none !important; }
-
-.loader {
-	margin: 10px auto auto; width: 45px; aspect-ratio: 1;
-	--c: no-repeat linear-gradient(var(--loader-color) 0 0);
-	background: var(--c) 0% 50%, var(--c) 50% 50%, var(--c) 100% 50%;
-	background-size: 20% 100%; animation: l1 1s infinite linear;
-}
-@keyframes l1 {
-	0%   { background-size: 20% 100%, 20% 100%, 20% 100%; }
-	33%  { background-size: 20% 10% , 20% 100%, 20% 100%; }
-	50%  { background-size: 20% 100%, 20% 10% , 20% 100%; }
-	66%  { background-size: 20% 100%, 20% 100%, 20% 10% ; }
-	100% { background-size: 20% 100%, 20% 100%, 20% 100%; }
-}
-
-fieldset.textureSettings > div { display: flex; flex-wrap: wrap; gap: 15px 0; }
-fieldset.textureSettings > div > div { flex: 1 1 auto; }
-#texturePreviewCont { text-align: center; min-width: 260px; }
-#texturePreviewCont img {
-	margin: 5px; display: inline-block; border: none; 
-	width: 40%; max-width: 140px; image-rendering: pixelated;
-}
-
-/* Inputs e selects no modo escuro, borda mais sutil */
-body.dark-mode input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="file"]), 
-body.dark-mode textarea,
-body.dark-mode select {
-    border-color: var(--secondary-accent-color); 
-}
-/* Estilo para o file-selector-button no modo escuro */
-body.dark-mode input[type="file"]::file-selector-button {
+#languageSelector { /* Deixar select visível, estilizado como botão */
+    opacity: 1;
+    position: static;
     background-color: var(--button-background-color);
     color: var(--text-color);
-    border-color: var(--primary-accent-color);
+    border: 1px solid var(--primary-accent-color);
+    border-radius: 5px;
+    padding: 0.25em 0.5em;
 }
-body.dark-mode input[type="file"]:not(:disabled):hover::file-selector-button {
-    background: var(--button-hover-background-color);
+
+/* --- CONTEÚDO PRINCIPAL --- */
+main#mainContent { /* Ajustes para o novo <main> */
+    flex-grow: 1; /* Faz o main ocupar o espaço restante até o footer */
+	margin: 0 auto; /* Centralizado, sem posicionamento absoluto */
+	padding: 2rem;
+	width: 100%;
+	max-width: 1200px; /* Largura máxima para o conteúdo */
+	box-sizing: border-box;
+    /* Removido background, border, etc. pois o body cuida disso agora */
+}
+
+.hero-section {
+    text-align: center;
+    padding: 2rem 0 3rem;
+}
+.hero-section h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-color); /* Texto principal claro */
+}
+.hero-section p {
+    font-size: 1.125rem;
+    color: var(--text-color-darker); /* Texto secundário um pouco mais escuro */
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* --- SEÇÃO DE UPLOAD --- */
+.upload-section {
+    background-color: var(--card-background-color);
+    border-radius: 0.75rem; /* 12px */
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: center;
+}
+.upload-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+.upload-section > p { /* Parágrafo de descrição abaixo do h2 */
+    color: var(--text-color-darker);
+    margin-bottom: 1.5rem;
+}
+
+.drag-drop-area {
+    border: 2px dashed var(--primary-accent-color);
+    border-radius: 0.5rem;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    position: relative; /* Para o input overlay */
+    background-color: rgba(0,0,0,0.1); /* Fundo sutil para a área de drop */
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+.drag-drop-area:hover {
+    background-color: rgba(0,0,0,0.15);
+    border-color: var(--secondary-accent-color);
+}
+.drag-drop-area .material-symbols {
+    font-size: 3rem;
+    color: var(--primary-accent-color);
+    margin-bottom: 0.5rem;
+}
+.drag-drop-area p {
+    color: var(--text-color-darker);
+    margin: 0;
+}
+.file-input-overlay { /* Para tornar o input de arquivo invisível mas funcional */
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+.alternative-uploads {
+    margin-top: 1.5rem;
+    border: 1px solid var(--card-border-color);
+    border-radius: 0.5rem;
+}
+.alternative-uploads summary {
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-color-darker);
+    border-radius: 0.5rem 0.5rem 0 0; /* Arredondar cantos superiores */
+}
+.alternative-uploads[open] > summary {
+    background-color: rgba(0,0,0,0.05);
+}
+.alt-upload-options {
+    padding: 1rem;
+    border-top: 1px solid var(--card-border-color); /* Linha separadora */
+}
+.alt-upload-options legend {
+    font-weight: 500;
+    padding: 0 0.5em;
+    color: var(--text-color);
+}
+.buttonlike.small-button {
+    display: inline-block;
+    padding: 0.5em 1em;
+    font-size: 0.9rem;
+    margin-top: 0.5em;
+}
+
+/* --- ESTRUTURA HOLOPRINT ORIGINAL DENTRO DE <details> --- */
+#allSettingsContainer {
+    background-color: var(--card-background-color);
+    border: 1px solid var(--card-border-color);
+    border-radius: 0.75rem;
+    margin-top: 2rem;
+    padding: 0; /* O padding será nos filhos */
+}
+#allSettingsContainer > summary { /* Estilo para o sumário principal das configurações */
+    padding: 1rem 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 0.75rem 0.75rem 0 0; /* Arredonda topo */
+    background-color: transparent;
+}
+#allSettingsContainer[open] > summary {
+    background-color: rgba(0,0,0,0.1); /* Leve destaque quando aberto */
+    border-bottom: 1px solid var(--card-border-color);
+}
+#allSettingsContainer .multiTabCont { /* Contêiner das abas originais */
+    padding: 1.5rem;
+}
+/* Ajustes para os fieldsets dentro das abas */
+#allSettingsContainer .multiTabCont > fieldset {
+    background-color: transparent; /* Remove fundo duplicado */
+    border: 1px solid var(--fieldset-border-color); /* Mantém bordas */
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 0.5rem;
+}
+#allSettingsContainer .multiTabCont > label.buttonlike {
+    background-color: var(--button-background-color);
+    border: 1px solid var(--primary-accent-color);
+    color: var(--text-color);
+}
+#allSettingsContainer .multiTabCont > input[type="radio"]:checked + label.buttonlike {
+    background-color: var(--buttonlike-tab-active-bg);
+    border-bottom-color: var(--buttonlike-tab-active-bg); /* Simula conexão */
+}
+
+
+/* BOTÃO DE GERAR E TERMOS */
+#generatePackButton {
+    display: block;
+    width: auto; /* Largura automática, centralizado pelo wrapper */
+    min-width: 250px; /* Largura mínima */
+    margin: 2rem auto 0.5rem; /* Centralizado e espaçado */
+    padding: 0.75rem 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--packinfobutton-text-color);
+    border: 2px solid var(--packinfobutton-border-color);
+    background-image: repeating-linear-gradient(150deg, var(--packinfobutton-bg-col1) 0, var(--packinfobutton-bg-col1) 10px, var(--packinfobutton-bg-col2) 10px, var(--packinfobutton-bg-col2) 20px);
+	background-size: 200%;
+    border-radius: 0.5rem;
+    transition: transform 0.1s ease-out, box-shadow 0.2s;
+}
+#generatePackButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+}
+#generatePackButton:active {
+    transform: translateY(0px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.25);
+}
+#termsOfUseNotice {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-color-darker);
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+#termsOfUseNotice a {
+    color: var(--secondary-accent-color);
+    text-decoration: underline;
+}
+
+/* PackInfoButton - quando o pack é gerado */
+.packInfoButton { /* Estilização similar ao botão de gerar */
+    color: var(--packinfobutton-text-color);
+    border: 2px solid var(--packinfobutton-border-color);
+    background-image: repeating-linear-gradient(150deg, var(--packinfobutton-bg-col1) 0, var(--packinfobutton-bg-col1) 10px, var(--packinfobutton-bg-col2) 10px, var(--packinfobutton-bg-col2) 20px);
+	background-size: 200%;
+}
+.packInfoButton.failed, .packInfoButton.reportIssue {
+    color: #FFFFFF; /* Garante texto branco em botão de erro */
+}
+
+/* --- RODAPÉ --- */
+#appFooter {
+    background-color: var(--card-background-color);
+    border-top: 1px solid var(--card-border-color);
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-color-darker);
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.footer-column {
+    flex: 1;
+    min-width: 200px; /* Para não ficarem muito espremidas */
+    text-align: left;
+}
+.footer-column h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+}
+.footer-column p, .footer-column ul {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+.footer-column ul {
+    list-style: none;
+    padding-left: 0;
+}
+.footer-column ul li a {
+    color: var(--text-color-darker);
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+.footer-column ul li a:hover {
+    color: var(--primary-accent-color);
+}
+
+
+/* Ajustes Finais para Elementos do HoloPrint Original dentro da Nova Estrutura */
+#completedPacksCont, #log {
+    margin-top: 1.5rem;
+}
+body.dark-mode simple-logger {
+    --sl-log-default-color: var(--text-color-darker);
+    --sl-log-info-color: #63B3ED; /* Azul claro */
+    --sl-log-warn-color: #F6E05E; /* Amarelo */
+    --sl-log-error-color: #FC8181; /* Vermelho claro */
+    --sl-log-debug-color: #A0AEC0; /* Cinza */
+    background-color: rgba(31, 41, 55, 0.7); /* Fundo para o logger */
+    border-top: 1px solid var(--card-border-color);
+}
+simple-logger { /* Estilo base para o logger */
+    background-color: rgba(249, 250, 251, 0.7);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+
+/* Ajustar os inputs de file dentro dos fieldsets alternativos */
+.alt-upload-options input[type="file"] {
+    display: none; /* Esconde o input default */
+}
+.alt-upload-options .buttonlike { /* Faz o label parecer um botão */
+    display: inline-block; /* Para que possa ter padding e ser clicável */
+    cursor: pointer;
 }
