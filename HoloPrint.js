@@ -1,4 +1,4 @@
-// START OF MODIFIED HoloPrint.js
+// START OF MODIFIED HoloPrint.js (Seu HoloLab com a correção)
 
 import * as NBT from "nbtify";
 import { ZipWriter, TextReader, BlobWriter, BlobReader, ZipReader } from "@zip.js/zip.js";
@@ -13,7 +13,7 @@ import { addPaddingToImage, arrayMin, awaitAllEntries, CachingFetcher, concatena
 import ResourcePackStack from "./ResourcePackStack.js";
 import BlockUpdater from "./BlockUpdater.js";
 
-export const VERSION = "dev"; // Versão interna do HoloPrint base
+export const VERSION = "dev";
 export const IGNORED_BLOCKS = ["air", "piston_arm_collision", "sticky_piston_arm_collision"];
 const IGNORED_BLOCK_ENTITIES = ["Beacon", "Beehive", "Bell", "BrewingStand", "ChiseledBookshelf", "CommandBlock", "Comparator", "Conduit", "EnchantTable", "EndGateway", "JigsawBlock", "Lodestone", "SculkCatalyst", "SculkShrieker", "SculkSensor", "CalibratedSculkSensor", "StructureBlock", "BrushableBlock", "TrialSpawner", "Vault"];
 export const PLAYER_CONTROL_NAMES = {
@@ -49,14 +49,6 @@ const HOLOGRAM_LAYER_MODES = createNumericEnum(["SINGLE", "ALL_BELOW"]);
 const FIXED_PACK_ICON_PATH = "guihjzzz.png";
 const HOLOLAB_VERSION_STRING = "HoloLab dev";
 
-/**
- * Makes a HoloLab resource pack from a structure file.
- * @param {File|Array<File>} structureFiles
- * @param {HoloPrintConfig} [config]
- * @param {ResourcePackStack} [resourcePackStack]
- * @param {HTMLElement} [previewCont]
- * @returns {Promise<File>} Resource pack (`*.mcpack`)
- */
 export async function makePack(structureFiles, config = {}, resourcePackStack, previewCont) {
 	console.info(`Running HoloLab (based on HoloPrint ${VERSION})`);
 	if(!resourcePackStack) {
@@ -104,8 +96,7 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 			hudScreenUI: config.MATERIAL_LIST_ENABLED? "ui/hud_screen.json" : undefined,
 			customEmojiFont: "font/glyph_E2.png",
 			languagesDotJson: "texts/languages.json",
-            // Load templates to be used as base for lang file construction
-            en_US_lang_pack_template: "texts/en_US.lang",
+            en_US_lang_pack_template: "texts/en_US.lang", // Carrega os templates para construção dos arquivos .lang finais
             pt_BR_lang_pack_template: "texts/pt_BR.lang",
             zh_CN_lang_pack_template: "texts/zh_CN.lang"
 		},
@@ -131,13 +122,13 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
         boundingBoxOutlineParticle, blockValidationParticle, savingBackupParticle, 
         singleWhitePixelTexture, exclamationMarkTexture, saveIconTexture, itemTexture, 
         terrainTexture, hudScreenUI, customEmojiFont, languagesDotJson, 
-        en_US_lang_pack_template, pt_BR_lang_pack_template, zh_CN_lang_pack_template, // Destructure loaded templates
+        en_US_lang_pack_template, pt_BR_lang_pack_template, zh_CN_lang_pack_template,
         resourceItemTexture, itemIcons 
     } = loadedStuff.files;
 	
     let { blockMetadata, itemMetadata } = loadedStuff.data;
 
-    let packageTemplateLangFiles = { // Store loaded templates
+    let packageTemplateLangFiles = {
         "en_US": en_US_lang_pack_template,
         "pt_BR": pt_BR_lang_pack_template,
         "zh_CN": zh_CN_lang_pack_template
@@ -252,6 +243,7 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 	}
 	let entityDescription = entityFile["minecraft:client_entity"]["description"];
 	
+	let totalMaterialCountCalculated = 0;
 	let totalBlocksToValidateByStructure = [];
 	let totalBlocksToValidateByStructureByLayer = [];
 	let uniqueBlocksToValidate = new Set();
@@ -476,6 +468,95 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 		totalBlocksToValidateByStructureByLayer.push(blocksToValidateByLayer);
 	});
 	
+    totalMaterialCountCalculated = materialList.totalMaterialCount;
+
+	entityDescription["materials"]["hologram"] = "holoprint_hologram";
+	entityDescription["materials"]["hologram.wrong_block_overlay"] = "holoprint_hologram.wrong_block_overlay";
+	entityDescription["textures"]["hologram.overlay"] = "textures/entity/overlay";
+	entityDescription["textures"]["hologram.save_icon"] = "textures/particle/save_icon";
+	entityDescription["animations"]["hologram.align"] = "animation.armor_stand.hologram.align";
+	entityDescription["animations"]["hologram.offset"] = "animation.armor_stand.hologram.offset";
+	entityDescription["animations"]["hologram.spawn"] = "animation.armor_stand.hologram.spawn";
+	entityDescription["animations"]["hologram.wrong_block_overlay"] = "animation.armor_stand.hologram.wrong_block_overlay";
+	entityDescription["animations"]["controller.hologram.spawn_animation"] = "controller.animation.armor_stand.hologram.spawn_animation";
+	entityDescription["animations"]["controller.hologram.layers"] = "controller.animation.armor_stand.hologram.layers";
+	entityDescription["animations"]["controller.hologram.bounding_box"] = "controller.animation.armor_stand.hologram.bounding_box";
+	entityDescription["animations"]["controller.hologram.block_validation"] = "controller.animation.armor_stand.hologram.block_validation";
+	entityDescription["animations"]["controller.hologram.saving_backup_particles"] = "controller.animation.armor_stand.hologram.saving_backup_particles";
+	entityDescription["scripts"]["animate"] ??= [];
+	entityDescription["scripts"]["animate"].push("hologram.align", "hologram.offset", "hologram.wrong_block_overlay", "controller.hologram.spawn_animation", "controller.hologram.layers", "controller.hologram.bounding_box", "controller.hologram.block_validation", "controller.hologram.saving_backup_particles");
+	entityDescription["scripts"]["should_update_bones_and_effects_offscreen"] = true; 
+	entityDescription["scripts"]["initialize"] ??= [];
+	entityDescription["scripts"]["initialize"].push(functionToMolang(entityScripts.armorStandInitialization, {
+		structureSize: structureSizes[0],
+		initialOffset: config.INITIAL_OFFSET,
+		defaultTextureIndex,
+		singleLayerMode: HOLOGRAM_LAYER_MODES.SINGLE,
+		structureCount: structureFiles.length
+	}));
+	entityDescription["scripts"]["pre_animation"] ??= [];
+	entityDescription["scripts"]["pre_animation"].push(functionToMolang(entityScripts.armorStandPreAnimation, {
+		textureBlobsCount: textureBlobs.length,
+		totalBlocksToValidate: arrayToMolang(totalBlocksToValidateByStructure, "v.hologram.structure_index"),
+		totalBlocksToValidateByLayer: array2DToMolang(totalBlocksToValidateByStructureByLayer, "v.hologram.structure_index", "v.hologram.layer"),
+		backupSlotCount: config.BACKUP_SLOT_COUNT,
+		structureWMolang,
+		structureHMolang,
+		structureDMolang,
+		toggleRendering: itemCriteriaToMolang(config.CONTROLS.TOGGLE_RENDERING),
+		changeOpacity: itemCriteriaToMolang(config.CONTROLS.CHANGE_OPACITY),
+		toggleTint: itemCriteriaToMolang(config.CONTROLS.TOGGLE_TINT),
+		toggleValidating: itemCriteriaToMolang(config.CONTROLS.TOGGLE_VALIDATING),
+		changeLayer: itemCriteriaToMolang(config.CONTROLS.CHANGE_LAYER),
+		decreaseLayer: itemCriteriaToMolang(config.CONTROLS.DECREASE_LAYER),
+		changeLayerMode: itemCriteriaToMolang(config.CONTROLS.CHANGE_LAYER_MODE),
+		rotateHologram: itemCriteriaToMolang(config.CONTROLS.ROTATE_HOLOGRAM),
+		disablePlayerControls: itemCriteriaToMolang(config.CONTROLS.DISABLE_PLAYER_CONTROLS),
+		backupHologram: itemCriteriaToMolang(config.CONTROLS.BACKUP_HOLOGRAM),
+		singleLayerMode: HOLOGRAM_LAYER_MODES.SINGLE,
+		ACTIONS: entityScripts.ACTIONS
+	}));
+	entityDescription["geometry"]["hologram.wrong_block_overlay"] = "geometry.armor_stand.hologram.wrong_block_overlay";
+	entityDescription["geometry"]["hologram.valid_structure_overlay"] = "geometry.armor_stand.hologram.valid_structure_overlay";
+	entityDescription["geometry"]["hologram.particle_alignment"] = "geometry.armor_stand.hologram.particle_alignment";
+	entityDescription["render_controllers"] ??= [];
+	entityDescription["render_controllers"].push({
+		"controller.render.armor_stand.hologram": "v.hologram.rendering"
+	}, {
+		"controller.render.armor_stand.hologram.wrong_block_overlay": "v.hologram.show_wrong_block_overlay"
+	}, {
+		"controller.render.armor_stand.hologram.valid_structure_overlay": "v.hologram.validating && v.wrong_blocks == 0"
+	}, "controller.render.armor_stand.hologram.particle_alignment");
+	entityDescription["particle_effects"] ??= {};
+	entityDescription["particle_effects"]["bounding_box_outline"] = "hololab:bounding_box_outline";
+	entityDescription["particle_effects"]["saving_backup"] = "hololab:saving_backup";
+	
+	textureBlobs.forEach(([textureName]) => {
+		entityDescription["textures"][textureName] = `textures/entity/${textureName}`;
+		hologramRenderControllers["render_controllers"]["controller.render.armor_stand.hologram"]["arrays"]["textures"]["Array.textures"].push(`Texture.${textureName}`);
+	});
+	
+	let tintColorChannels = hexColorToClampedTriplet(config.TINT_COLOR);
+	hologramRenderControllers["render_controllers"]["controller.render.armor_stand.hologram"]["overlay_color"] = {
+		"r": +tintColorChannels[0].toFixed(4),
+		"g": +tintColorChannels[1].toFixed(4),
+		"b": +tintColorChannels[2].toFixed(4),
+		"a": `v.hologram.show_tint? ${config.TINT_OPACITY} : 0`
+	};
+	
+	let overlayTexture = await singleWhitePixelTexture.setOpacity(config.WRONG_BLOCK_OVERLAY_COLOR[3]);
+		
+	uniqueBlocksToValidate.forEach(blockName => {
+		let particleName = `validate_${blockName.replace(":", ".")}`;
+		entityDescription["particle_effects"][particleName] = `hololab:${particleName}`;
+	});
+	
+    // CORREÇÃO: playerRenderControllers é definido condicionalmente
+    let playerRenderControllers;
+	if(config.PLAYER_CONTROLS_ENABLED && defaultPlayerRenderControllers){ // Adicionado defaultPlayerRenderControllers na checagem
+		playerRenderControllers = addPlayerControlsToRenderControllers(config, defaultPlayerRenderControllers);
+	}
+	
     let finalisedMaterialLists = Object.fromEntries(languagesDotJson.map(languageCode => {
         materialList.setLanguage(fullResourceLangFiles[languageCode] || fullResourceLangFiles["en_US"]);
         return [languageCode, materialList.export()];
@@ -483,8 +564,13 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 	let finalisedMaterialListForHUD = finalisedMaterialLists["en_US"]; 
 	
 	let highestItemCount;
-	if(config.MATERIAL_LIST_ENABLED) {
+	if(config.MATERIAL_LIST_ENABLED && hudScreenUI) { // Adicionado check para hudScreenUI
 		let missingItemAux = blockMetadata["data_items"].find(block => block.name == "minecraft:reserved6")?.["raw_id"] ?? 0;
+		
+        // Assegurar que a estrutura interna de hudScreenUI existe
+        hudScreenUI["material_list_entries"] ??= {};
+        hudScreenUI["material_list_entries"]["controls"] ??= [];
+
 		hudScreenUI["material_list_entries"]["controls"].push(...finalisedMaterialListForHUD.map(({ translationKey, partitionedCount, auxId }, i) => ({
 			[`material_list_${i}@hud.material_list_entry`]: {
 				"$item_translation_key": translationKey,
@@ -496,11 +582,15 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 		highestItemCount = max(...finalisedMaterialListForHUD.map(({ count }) => count));
 		let longestItemNameLength = max(...finalisedMaterialListForHUD.map(({ translatedName }) => translatedName.length));
 		let longestCountLength = max(...finalisedMaterialListForHUD.map(({ partitionedCount }) => partitionedCount.length));
-		if(longestItemNameLength + longestCountLength >= 43) {
-			hudScreenUI["material_list"]["size"][0] = "50%"; 
-			hudScreenUI["material_list"]["max_size"][0] = "50%";
-		}
-		hudScreenUI["material_list"]["size"][1] = finalisedMaterialListForHUD.length * 12 + 12; 
+		
+        if (hudScreenUI["material_list"] && hudScreenUI["material_list"]["size"]) { // Check
+            if(longestItemNameLength + longestCountLength >= 43) {
+                hudScreenUI["material_list"]["size"][0] = "50%"; 
+                hudScreenUI["material_list"]["max_size"][0] = "50%";
+            }
+            hudScreenUI["material_list"]["size"][1] = finalisedMaterialListForHUD.length * 12 + 12; 
+        }
+
         if (hudScreenUI &&
             hudScreenUI["material_list_entry"] &&
             hudScreenUI["material_list_entry"]["controls"] &&
@@ -514,7 +604,7 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
         ) {
             hudScreenUI["material_list_entry"]["controls"][0]["content"]["controls"][3]["item_name"]["size"][0] += `${round(longestCountLength * 4.2 + 10)}px`;
         } else {
-            console.warn("Could not apply original HUD item_name size adjustment due to missing hudScreenUI structure.");
+            // console.warn("Could not apply original HUD item_name size adjustment due to missing hudScreenUI structure.");
         }
 	}
 	
@@ -568,19 +658,15 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 	};
 
 	let processedLanguageFiles = await Promise.all(languagesDotJson.map(async languageCode => {
-        // Use the pre-loaded template content from packageTemplateLangFiles
-        let langFileContent = packageTemplateLangFiles[languageCode] || packageTemplateLangFiles["en_US"] || `pack.name=${packName}\npack.description=HoloLab Pack`; // Fallback to English or a very basic default
+        let langFileContent = packageTemplateLangFiles[languageCode] || packageTemplateLangFiles["en_US"] || `pack.name=${packName}\npack.description=HoloLab Pack`;
 
-        // Replace general placeholders
 		langFileContent = langFileContent.replaceAll("{PACK_NAME}", packName);
 		langFileContent = langFileContent.replaceAll("{PACK_GENERATION_TIME}", packGenerationTime);
         
-        // MODIFICATION: Replace specific placeholders with an INVISIBLE CHARACTER
-        const INVISIBLE_CHAR = "\u200B"; // Zero Width Space (Unicode U+200B)
+        const INVISIBLE_CHAR = "\u200B"; 
         langFileContent = langFileContent.replaceAll("{TOTAL_MATERIAL_COUNT}", INVISIBLE_CHAR); 
         langFileContent = langFileContent.replaceAll("{MATERIAL_LIST}", INVISIBLE_CHAR);
 		
-        // Construct and replace dynamic sections if their placeholders exist in the template
 		let authorsText = "";
 		if(config.AUTHORS.length) {
             let authorsSectionTemplate = translate("pack.description.authors_template", languageCode) || "Authors: {STRUCTURE_AUTHORS}";
@@ -614,15 +700,14 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 		}
         langFileContent = langFileContent.replaceAll("{CONTROLS_SECTION}", controlsText);
 		
-        // Remove any remaining unfilled optional section placeholders (those that were not replaced above)
         const optionalSections = ["AUTHORS_SECTION", "DESCRIPTION_SECTION", "DISABLED_FEATURES_SECTION", "CONTROLS_SECTION"];
         optionalSections.forEach(sectionPlaceholder => {
             const regex = new RegExp(`\\{${sectionPlaceholder.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\}`, 'g');
-            langFileContent = langFileContent.replace(regex, ""); // Replace with empty string if not filled
+            langFileContent = langFileContent.replace(regex, "");
         });
 
-		langFileContent = langFileContent.replaceAll(/\t*#.+/g, ""); // remove comments
-        langFileContent = langFileContent.replace(/^\s*[\r\n]/gm, ""); // remove empty lines at start/middle
+		langFileContent = langFileContent.replaceAll(/\t*#.+/g, "");
+        langFileContent = langFileContent.replace(/^\s*[\r\n]/gm, "");
 
 		if(config.RENAME_CONTROL_ITEMS && controlItemTranslations && controlItemTranslations[languageCode]) {
 			langFileContent += "\n" + controlItemTranslations[languageCode];
@@ -633,7 +718,7 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 	
 	let hasModifiedTerrainTexture = false;
 	let controlItemTextures = [];
-	if(config.RETEXTURE_CONTROL_ITEMS) {
+	if(config.RETEXTURE_CONTROL_ITEMS && itemIcons && resourceItemTexture && textureAtlas?.blocksDotJson && textureAtlas?.terrainTexture) { // Adicionando checagens
 		let legacyItemMappings;
 		let loadingLegacyItemMappingsPromise;
 		let itemIconPatterns = Object.entries(itemIcons).filter(([key]) => key.startsWith("/") && key.endsWith("/")).map(([pattern, itemName]) => [new RegExp(pattern.slice(1, -1), "g"), itemName]);
@@ -687,12 +772,16 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 						originalTexturePath = textureAtlas.terrainTexture["texture_data"][textureAtlas.blocksDotJson[itemName]["carried_textures"]]["textures"];
 						itemName = textureAtlas.blocksDotJson[itemName]["carried_textures"];
 					} else {
-						console.warn(`Cannot retexture control item "${itemName}" because it is a block, and retexturing block items is currently unsupported or its carried texture is not an item texture.`);
+						// console.warn(`Cannot retexture control item "${itemName}" because it is a block, and retexturing block items is currently unsupported or its carried texture is not an item texture.`);
 						return;
 					}
 				} else {
 					loadingLegacyItemMappingsPromise ??= new Promise(async (res, rej) => {
 						try {
+                            if(!pmmpBedrockDataFetcher) { // Garante que o fetcher exista
+                                console.error("pmmpBedrockDataFetcher not initialized for legacy item mappings.");
+                                return rej("pmmpBedrockDataFetcher not initialized");
+                            }
 							legacyItemMappings = new Map();
 							let updateMappings = await pmmpBedrockDataFetcher.fetch("r16_to_current_item_map.json").then(res => res.json());
 							Object.entries(updateMappings["simple"]).forEach(([oldName, newName]) => {
@@ -714,15 +803,15 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 						console.error("Somehow failed loading legacy item mappings. Please report this on GitHub!", e);
 						return;
 					}
-					if(!legacyItemMappings.has(itemName)) {
-						console.warn(`Can't find control item texture for ${itemName}`);
+					if(!legacyItemMappings || !legacyItemMappings.has(itemName)) { // Adicionada verificação para legacyItemMappings
+						// console.warn(`Can't find control item texture for ${itemName}`);
 						return;
 					}
 					let [oldItemName, legacyVariant] = legacyItemMappings.get(itemName);
 					variant = legacyVariant;
 					originalTexturePath = resourceItemTexture["texture_data"][oldItemName]?.["textures"];
 					if(!originalTexturePath) {
-						console.warn(`Can't find control item texture for ${itemName} (${oldItemName})`);
+						// console.warn(`Can't find control item texture for ${itemName} (${oldItemName})`);
 						return;
 					}
 					itemName = oldItemName; 
@@ -730,17 +819,22 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 				
 				if(Array.isArray(originalTexturePath)) { 
 					if(variant == -1) {
-						console.warn(`Don't know which texture to use for control item texture for ${itemName}: [${originalTexturePath}]`);
+						// console.warn(`Don't know which texture to use for control item texture for ${itemName}: [${originalTexturePath}]`);
 						return;
 					}
 					if(!(variant in originalTexturePath)) {
 						console.error(`Item texture variant ${variant} for ${itemName} does not exist!`);
 						return;
 					}
-					itemTexture["texture_data"][itemName] ??= {
-						"textures": [...originalTexturePath] 
-					};
-					let specificOriginalTexturePath = `${itemTexture["texture_data"][itemName]["textures"][variant]}.png`;
+                    itemTexture["texture_data"][itemName] ??= { "textures": [] }; // Garante que exista
+					if(!Array.isArray(itemTexture["texture_data"][itemName]["textures"])){ // Se não for array, transforma em array
+						itemTexture["texture_data"][itemName]["textures"] = [itemTexture["texture_data"][itemName]["textures"]];
+					}
+                    while(itemTexture["texture_data"][itemName]["textures"].length <= variant) { // Preenche se necessário
+                         itemTexture["texture_data"][itemName]["textures"].push(null); // Ou um valor padrão
+                    }
+
+					let specificOriginalTexturePath = `${originalTexturePath[variant]}.png`; // Usa originalTexturePath
 					let originalImage;
 					try {
 						originalImage = await resourcePackStack.fetchResource(specificOriginalTexturePath).then(res => res.toImage());
@@ -749,29 +843,27 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 						return;
 					}
 					let overlayedImageBlob = await overlaySquareImages(originalImage, paddedTexture);
-					let newTexturePath = `${specificOriginalTexturePath.slice(0, -4)}_${control.toLowerCase()}.png`;
-					controlItemTextures.push([newTexturePath, overlayedImageBlob]);
-					itemTexture["texture_data"][itemName]["textures"][variant] = newTexturePath.slice(0, -4);
+					let newTexturePath = `${originalTexturePath[variant].replace(/^textures\/items\//, "")}_${control.toLowerCase()}.png`;
+					controlItemTextures.push([`textures/items/${newTexturePath}`, overlayedImageBlob]); // Adiciona o caminho completo
+					itemTexture["texture_data"][itemName]["textures"][variant] = `textures/items/${newTexturePath.slice(0, -4)}`;
 				} else {
 					let itemTextureSize = 16;
 					if(resourcePackStack.hasResourcePacks) {
 						try {
 							let originalImage = await resourcePackStack.fetchResource(`${originalTexturePath}.png`).then(res => res.toImage());
 							itemTextureSize = originalImage.width;
-						} catch(e) {
-							console.warn(`Could not load item texture ${originalTexturePath} for overlay texture scaling calculations!`, e);
-						}
+						} catch(e) { /* console.warn(`Could not load item texture ${originalTexturePath} for overlay texture scaling calculations!`, e); */ }
 					}
 					let safeSize = lcm(paddedTexture.width, itemTextureSize) * config.CONTROL_ITEM_TEXTURE_SCALE; 
 					controlItemTextureSizes.add(safeSize);
 					(usingTerrainAtlas? terrainTexture : itemTexture)["texture_data"][itemName] = {
-						"textures": [originalTexturePath, `${controlTexturePath.slice(0, -4)}_${safeSize}`],
+						"textures": [originalTexturePath, `textures/items/~${control.toLowerCase()}_${safeSize}`], // Adiciona caminho completo
 						"additive": true 
 					};
 				}
 			}));
 			await Promise.all([...controlItemTextureSizes].map(async size => {
-				let resizedImagePath = `${controlTexturePath.slice(0, -4)}_${size}.png`;
+				let resizedImagePath = `textures/items/~${control.toLowerCase()}_${size}.png`; // Adiciona caminho completo
 				let resizedTextureBlob = await resizeImageToBlob(paddedTexture, size);
 				controlItemTextures.push([resizedImagePath, resizedTextureBlob]);
 			}));
@@ -825,9 +917,9 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 		}
 		packFiles.push(...controlItemTextures);
 	}
-	if(config.MATERIAL_LIST_ENABLED) {
+	if(config.MATERIAL_LIST_ENABLED && hudScreenUI) { // Adicionado check para hudScreenUI
 		packFiles.push(["ui/hud_screen.json", JSON.stringify(hudScreenUI)]);
-		if(highestItemCount >= 1728) {
+		if(highestItemCount >= 1728 && customEmojiFont) { // Adicionado check para customEmojiFont
 			packFiles.push(["font/glyph_E2.png", await customEmojiFont.toBlob()]);
 		}
 	}
@@ -857,8 +949,7 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 				(new PreviewRenderer(previewCont, textureAtlas, geo, hologramAnimations, config.SHOW_PREVIEW_SKYBOX)).catch(e => console.error("Preview renderer error:", e)); 
 			});
 		};
-        // Calcular totalBlockCountForPreview para decidir se mostra o preview
-		let totalBlockCountForPreview = allStructureIndicesByLayer.reduce((sum, structureIndices) => {
+        let totalBlockCountForPreview = allStructureIndicesByLayer.reduce((sum, structureIndices) => {
             return sum + structureIndices.flat().filter(paletteIndex => {
                 return paletteIndex !== -1 && blockPalette[paletteIndex] && blockPalette[paletteIndex].name !== 'air';
             }).length;
@@ -870,14 +961,14 @@ export async function makePack(structureFiles, config = {}, resourcePackStack, p
 			let message = document.createElement("div");
 			message.classList.add("previewMessage", "clickToView");
 			let p = document.createElement("p");
-			p.dataset.translationSubTotalBlockCount = totalBlockCountForPreview;
+			p.dataset.translationSubTotalBlockCount = totalBlockCountForPreview.toString();
 			if(structureFiles.length == 1) {
 				p.dataset.translate = "preview.click_to_view";
 			} else {
 				p.dataset.translate = "preview.click_to_view_multiple";
 			}
 			message.appendChild(p);
-			message.onEvent("click", () => {
+			message.addEventListener("click", () => { // Mudado para addEventListener
 				message.remove();
 				showPreview();
 			});
@@ -1366,7 +1457,7 @@ function patchRenderControllers(renderControllers, patches) {
 			let controller = renderControllers["render_controllers"][controllerId];
 			if(!controller) {
 				console.error(`No render controller ${controllerId} found!`, renderControllers);
-				return;
+				return; // Retornar aqui pode causar problemas se a chamada espera um valor.
 			}
 			let originalTexture0 = controller["textures"][0];
 			patch = patch.replace(/\n|\t/g, "");
@@ -1379,7 +1470,7 @@ function patchRenderControllers(renderControllers, patches) {
 				...controller,
 				"textures": [patch, ...controller["textures"].slice(1)]
 			}];
-		}).removeFalsies())
+		}).filter(Boolean)) // Adicionado filter(Boolean) para remover entradas undefined
 	};
 }
 /**
@@ -1415,7 +1506,7 @@ async function translateControlItems(config, blockMetadata, itemMetadata, langua
 			translatedControlNames[control] = translatedControlName;
 			inGameControls[languageCode] += `\n${translatedControlName}: ${[itemInfo.map(item => `§3${item.translatedName}§r`).join(", "), itemCriteria.tags.map(tag => `§p${tag}§r`).join(", ")].removeFalsies().join("; ")}`;
 			
-			let itemsInTags = itemCriteria.tags.filter(tag => !tag.includes(":")).map(tag => itemTags[`minecraft:${tag}`]).removeFalsies().flat().map(itemName => itemName.replace(/^minecraft:/, ""));
+			let itemsInTags = itemCriteria.tags.filter(tag => !tag.includes(":")).map(tag => itemTags?.[`minecraft:${tag}`]).removeFalsies().flat().map(itemName => itemName.replace(/^minecraft:/, ""));
 			itemsInTags.forEach(itemName => controlsMaterialList.addItem(itemName));
 			controlItemTranslationKeys[control] = new Set();
 			controlsMaterialList.export().forEach(({ translationKey, translatedName }) => {
@@ -1511,6 +1602,7 @@ async function makePackIconFallback(structureFile) {
  * @returns {Array<String>}
  */
 function expandItemCriteria(itemCriteria, itemTags) {
+    if (!itemTags) return [...itemCriteria.names]; // Retorna apenas nomes se itemTags não estiver definido
 	let minecraftTags = itemCriteria["tags"].filter(tag => !tag.includes(":")); 
 	let namespacedItemsFromTags = minecraftTags.map(tag => itemTags[`minecraft:${tag}`]).flat().removeFalsies();
 	return [...itemCriteria["names"], ...namespacedItemsFromTags.map(itemName => itemName.replace(/^minecraft:/, ""))];
@@ -1679,11 +1771,7 @@ function functionToMolang(func, vars = {}) {
 	let variabledCode = substituteInVariables(conditionedCode, vars);
 	return variabledCode;
 }
-/**
- * JSON.stringify(), but shortens numbers to at most 4 decimal places to avoid JS floating-point errors making stringified numbers long.
- * @param {*} value
- * @returns {String}
- */
+
 function stringifyWithFixedDecimals(value) {
 	const NUMBER_OF_DECIMALS = 4;
 	return JSON.stringify(value, (key, x) => {
@@ -1694,9 +1782,8 @@ function stringifyWithFixedDecimals(value) {
 	});
 }
 
-// Type definitions follow... (unchanged from original)
-// ... (rest of the HoloPrint.js file with typedefs)
-
+// Type definitions (HoloPrintConfig, ItemCriteria, Block, etc.)
+// ... (mantidas como no original)
 /**
  * An object for storing HoloPrint config options.
  * @typedef {Object} HoloPrintConfig
